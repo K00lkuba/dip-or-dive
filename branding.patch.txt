@@ -1,0 +1,17 @@
+*** a/index.html
+--- b/index.html
+***************
+-  <title>Last-Minute Cram</title>
++  <title>Dip or Dive</title>
+*** a/src/App.tsx
+--- b/src/App.tsx
+***************
+-        <h1 className="text-xl font-bold flex items-center gap-2">Last-Minute Cram</h1>
++        <h1 className="text-xl font-bold flex items-center gap-2">Dip or Dive</h1>
+*** a/README.md
+--- b/README.md
+***************
+-# Last-Minute Cram
++# Dip or Dive
++
++Skim the essentials or plunge into the details. Choose your style of study.
