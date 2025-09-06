@@ -1,77 +1,137 @@
-diff --git a/src/components/NotesPanel.tsx b/src/components/NotesPanel.tsx
-new file mode 100644
---- /dev/null
-+++ b/src/components/NotesPanel.tsx
-@@ -0,0 +86 @@
-+// @@NOTES_PANEL_START
-+import { useEffect, useState } from 'react'
+## Plan (pseudocode)
+
+* Ensure the notes widget is **Client-only** and **SSR-safe**.
+* Avoid hydration mismatch by loading from `localStorage` **after mount**.
+* Debounce autosave; keep explicit **Save**/**Clear** actions.
+* Change API to `storageKey` so callers aren't forced to have `section.id`.
+* In `StepCard`, derive a stable key from typical fields (`id | slug | key | title`) to avoid TS error at the line that used `section.id`.
+
+---
+
+### `src/components/NotesPanel.tsx`
+
+```tsx
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import type { ChangeEvent } from 'react'
+
+// "why": SSR-safe guards; some environments don't expose window/localStorage
+const hasWindow = typeof window !== 'undefined'
+
+function safeGet(key: string): string {
+  if (!hasWindow) return ''
+  try {
+    return window.localStorage.getItem(key) ?? ''
+  } catch {
+    return ''
+  }
+}
+
+function safeSet(key: string, v: string) {
+  if (!hasWindow) return
+  try {
+    window.localStorage.setItem(key, v)
+  } catch {
+    /* no-op */
+  }
+}
+
+export type NotesPanelProps = { storageKey: string }
+
+export default function NotesPanel({ storageKey }: NotesPanelProps) {
+  const [val, setVal] = useState('')
+  const [status, setStatus] = useState<string | null>(null)
+  const debounceRef = useRef<number>()
+
+  // Load once on mount or when storageKey changes
+  useEffect(() => {
+    setVal(safeGet(storageKey))
+  }, [storageKey])
+
+  // Debounced autosave
+  useEffect(() => {
+    if (!hasWindow) return
+    if (!storageKey) return
+
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current)
+    }
+
+    debounceRef.current = window.setTimeout(() => {
+      safeSet(storageKey, val)
+    }, 500)
+
+    return () => {
+      if (debounceRef.current) window.clearTimeout(debounceRef.current)
+    }
+  }, [storageKey, val])
+
+  const clearNow = () => {
+    setVal('')
+    safeSet(storageKey, '')
+    setStatus('Cleared.')
+    if (hasWindow) window.setTimeout(() => setStatus(null), 1200)
+  }
+
+  const saveNow = () => {
+    safeSet(storageKey, val)
+    setStatus('Saved.')
+    if (hasWindow) window.setTimeout(() => setStatus(null), 1200)
+  }
+
+  return (
+    <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 space-y-2">
+      <div className="text-sm font-semibold">My Notes</div>
+      <textarea
+        className="w-full min-h-[120px] bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm"
+        placeholder="Jot quick bullets or a summary for this section..."
+        value={val}
+        onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setVal(e.target.value)}
+        aria-label="Notes for this section"
+      />
+      <div className="flex items-center gap-2">
+        <button onClick={clearNow} className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700">
+          Clear
+        </button>
+        <button onClick={saveNow} className="px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600">
+          Save
+        </button>
+        {status && <span className="text-xs text-slate-400">{status}</span>}
+      </div>
+      <p className="text-xs text-slate-400">Notes are saved locally in your browser.</p>
+    </div>
+  )
+}
+```
+
+---
+
+### Patch for `src/components/StepCard.tsx`
+
+```diff
+@@
+- import PromptCard from './PromptCard'
+- import NotesPanel from './NotesPanel'
++ import PromptCard from './PromptCard'
++ import NotesPanel from './NotesPanel'
++ import type { Section } from '../config/module.config'
 +
-+function safeGet(key: string): string {
-+  try { return localStorage.getItem(key) ?? '' } catch { return '' }
-+}
-+function safeSet(key: string, v: string) {
-+  try { localStorage.setItem(key, v) } catch {}
-+}
-+
-+export default function NotesPanel({ sectionId }: { sectionId: string }) {
-+  const storageKey = `notes.${sectionId}`
-+  const [val, setVal] = useState<string>(() => safeGet(storageKey))
-+  const [status, setStatus] = useState<string | null>(null)
-+
-+  useEffect(() => { safeSet(storageKey, val) }, [storageKey, val])
-+
-+  return (
-+    <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 space-y-2">
-+      <div className="text-sm font-semibold">My Notes</div>
-+      <textarea
-+        className="w-full min-h-[120px] bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm"
-+        placeholder="Jot quick bullets or a summary for this section..."
-+        value={val}
-+        onChange={(e) => setVal(e.target.value)}
-+      />
-+      <div className="flex gap-2">
-+        <button
-+          onClick={() => { setVal(''); safeSet(storageKey, ''); setStatus('Cleared.'); setTimeout(()=>setStatus(null), 1500) }}
-+          className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700"
-+        >
-+          Clear
-+        </button>
-+        <button
-+          onClick={() => { safeSet(storageKey, val); setStatus('Saved.'); setTimeout(()=>setStatus(null), 1500) }}
-+          className="px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600"
-+        >
-+          Save
-+        </button>
-+        {status && <span className="text-xs text-slate-400">{status}</span>}
-+      </div>
-+      <p className="text-xs text-slate-400">Notes are saved locally in your browser.</p>
-+    </div>
-+  )
-+}
-+// @@NOTES_PANEL_END
-diff --git a/src/components/StepCard.tsx b/src/components/StepCard.tsx
---- a/src/components/StepCard.tsx
-+++ b/src/components/StepCard.tsx
-@@ -1,6 +1,7 @@
- // @@STEP_CARD_START
- import PromptCard from './PromptCard'
-+import NotesPanel from './NotesPanel'
- import type { Section } from '../config/module.config'
- 
- type Props = {
-   section: Section
-@@ -22,8 +23,12 @@ export default function StepCard({ section, instructions, promptsToShow, done, o
-       <div className="grid sm:grid-cols-2 gap-3">
-         {prompts.map((p, i) => (
-           <PromptCard key={i} label={p.label} text={p.text} instructions={instructions} />
-         ))}
-       </div>
- 
++ // "why": Section shape varies across modules; derive a stable key safely.
++ function getSectionKey(section: Section): string {
++   const s = section as unknown as Record<string, unknown>
++   const candidate = (s.id ?? s.slug ?? s.key ?? s.title ?? '') as string | number
++   return String(candidate)
++ }
+@@
+-      {/* Inline notes for this section (persisted locally) */}
+-      <NotesPanel sectionId={section.id} />
 +      {/* Inline notes for this section (persisted locally) */}
-+      <NotesPanel sectionId={section.id} />
-+
-       <div className="pt-1">
-         <button onClick={onDone}
-           className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600">
-           {done ? 'Marked Done ✓' : 'Mark Step Done'}
-         </button>
++      <NotesPanel storageKey={`notes.${getSectionKey(section)}`} />
+```
+
+> If `Section` already has a guaranteed `id: string`, you can simplify usage back to:
+>
+> ```tsx
+> <NotesPanel storageKey={`notes.${section.id}`}/>
+> ```
