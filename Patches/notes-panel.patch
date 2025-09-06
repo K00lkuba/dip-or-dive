@@ -1,0 +1,89 @@
+*** /dev/null
+--- b/src/components/NotesPanel.tsx
+***************
+*** 0 ****
+--- 1,86 ----
++ // @@NOTES_PANEL_START
++ import { useEffect, useState } from 'react'
++ 
++ function safeGet(key: string): string {
++   try { return localStorage.getItem(key) ?? '' } catch { return '' }
++ }
++ function safeSet(key: string, v: string) {
++   try { localStorage.setItem(key, v) } catch {}
++ }
++ 
++ export default function NotesPanel({ sectionId }: { sectionId: string }) {
++   const storageKey = `notes.${sectionId}`
++   const [val, setVal] = useState<string>(() => safeGet(storageKey))
++   const [status, setStatus] = useState<string | null>(null)
++ 
++   useEffect(() => { safeSet(storageKey, val) }, [storageKey, val])
++ 
++   return (
++     <div className="rounded-2xl bg-slate-900/60 border border-slate-800 p-4 space-y-2">
++       <div className="text-sm font-semibold">My Notes</div>
++       <textarea
++         className="w-full min-h-[120px] bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm"
++         placeholder="Jot quick bullets or a summary for this section…"
++         value={val}
++         onChange={(e) => setVal(e.target.value)}
++       />
++       <div className="flex gap-2">
++         <button
++           onClick={() => { setVal(''); safeSet(storageKey, ''); setStatus('Cleared.'); setTimeout(()=>setStatus(null), 1500) }}
++           className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700"
++         >
++           Clear
++         </button>
++         <button
++           onClick={() => { safeSet(storageKey, val); setStatus('Saved.'); setTimeout(()=>setStatus(null), 1500) }}
++           className="px-3 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600"
++         >
++           Save
++         </button>
++         {status && <span className="text-xs text-slate-400">{status}</span>}
++       </div>
++       <p className="text-xs text-slate-400">Notes are saved locally in your browser.</p>
++     </div>
++   )
++ }
++ // @@NOTES_PANEL_END
+*** a/src/components/StepCard.tsx
+--- b/src/components/StepCard.tsx
+***************
+*** 1,6 ****
+  // @@STEP_CARD_START
+  import PromptCard from './PromptCard'
+  import type { Section } from '../config/module.config'
+--- 1,7 ----
+  // @@STEP_CARD_START
+  import PromptCard from './PromptCard'
++ import NotesPanel from './NotesPanel'
+  import type { Section } from '../config/module.config'
+***************
+*** 22,33 ****
+        <div className="grid sm:grid-cols-2 gap-3">
+          {prompts.map((p, i) => (
+            <PromptCard key={i} label={p.label} text={p.text} instructions={instructions} />
+          ))}
+        </div>
+  
+        <div className="pt-1">
+          <button onClick={onDone}
+            className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600">
+            {done ? 'Marked Done ✓' : 'Mark Step Done'}
+--- 23,38 ----
+        <div className="grid sm:grid-cols-2 gap-3">
+          {prompts.map((p, i) => (
+            <PromptCard key={i} label={p.label} text={p.text} instructions={instructions} />
+          ))}
+        </div>
++ 
++       {/* Inline notes for this section (persisted locally) */}
++       <NotesPanel sectionId={section.id} />
+  
+        <div className="pt-1">
+          <button onClick={onDone}
+            className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600">
+            {done ? 'Marked Done ✓' : 'Mark Step Done'}

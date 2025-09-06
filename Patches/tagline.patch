@@ -1,0 +1,8 @@
+*** a/src/App.tsx
+--- b/src/App.tsx
+***************
+-        <h1 className="text-xl font-bold flex items-center gap-2">Dip or Dive</h1>
++        <div>
++          <h1 className="text-xl font-bold flex items-center gap-2">Dip or Dive</h1>
++          <p className="text-sm text-slate-400">Skim the essentials or plunge into the details</p>
++        </div>
