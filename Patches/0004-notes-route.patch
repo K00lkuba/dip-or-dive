@@ -1,0 +1,62 @@
+diff --git a/src/pages/NotesPage.tsx b/src/pages/NotesPage.tsx
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/src/pages/NotesPage.tsx
+@@ -0,0 +1,41 @@
++import React from 'react'
++import { NotesPanel } from '../features/notes/NotesPanel'
++
++/**
++ * /notes page that hosts the NotesPanel
++ * Why: put the demo into the real app routing
++ */
++export default function NotesPage() {
++  return (
++    <div className="min-h-screen bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100">
++      <header className="border-b p-4 dark:border-zinc-800">
++        <h1 className="text-2xl font-bold">Dip or Dive</h1>
++        <p className="text-sm opacity-70">Notes</p>
++        <nav className="mt-2 text-sm opacity-80">
++          <a className="underline" href="/">Home</a>
++        </nav>
++      </header>
++      <main className="p-4">
++        <NotesPanel />
++      </main>
++    </div>
++  )
++}
++diff --git a/src/main.tsx b/src/main.tsx
+index 1111111..2222222 100644
+--- a/src/main.tsx
++++ b/src/main.tsx
+@@ -1,12 +1,27 @@
+-import React from 'react'
+-import ReactDOM from 'react-dom/client'
+-import App from './App.tsx'
+-import './index.css'
+-
+-ReactDOM.createRoot(document.getElementById('root')!).render(
+-  <React.StrictMode>
+-    <App />
+-  </React.StrictMode>,
+-)
++import React from 'react'
++import ReactDOM from 'react-dom/client'
++import App from './App.tsx'
++import './index.css'
++import { createBrowserRouter, RouterProvider } from 'react-router-dom'
++import NotesPage from './pages/NotesPage'
++
++// Router with two routes: Home (existing App) and /notes
++const router = createBrowserRouter([
++  { path: '/', element: <App /> },
++  { path: '/notes', element: <NotesPage /> },
++])
++
++ReactDOM.createRoot(document.getElementById('root')!).render(
++  <React.StrictMode>
++    <RouterProvider router={router} />
++  </React.StrictMode>
++)

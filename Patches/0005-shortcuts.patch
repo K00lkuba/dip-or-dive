@@ -1,0 +1,65 @@
+diff --git a/scripts/setup-shortcuts.ps1 b/scripts/setup-shortcuts.ps1
+new file mode 100644
+index 0000000..1111111
+--- /dev/null
++++ b/scripts/setup-shortcuts.ps1
+@@ -0,0 +1,73 @@
++<#
++Setup shortcuts for your project.
++Run from ANY PowerShell:
++  powershell -ExecutionPolicy Bypass -File .\scripts\setup-shortcuts.ps1 -RepoPath "C:\\Jacob\\Study guide\\new start\\cram-site"
++#>
++
++param(
++  [Parameter(Mandatory = $false)]
++  [string]$RepoPath = (Join-Path (Get-Location) '.')
++)
++
++# Normalize the path
++$RepoPath = [System.IO.Path]::GetFullPath($RepoPath)
++
++Write-Host "Using repo path:" $RepoPath
++
++if (-not (Test-Path $RepoPath)) {
++  Write-Error "Path does not exist: $RepoPath"
++  exit 1
++}
++
++# 1) Create dev.bat so you can double-click to run the site
++#    Why: Quick launcher that opens in the project folder and runs Vite
++$devBat = @'
++@echo off
++setlocal
++cd /d "%~dp0"
++IF EXIST node_modules (echo deps ok) ELSE (echo First run: installing deps & npm install & call npm install)
++call npm run dev
++endlocal
++'@
++
++$devBatPath = Join-Path $RepoPath 'dev.bat'
++Set-Content -Path $devBatPath -Value $devBat -Encoding ascii
++Write-Host "Wrote" $devBatPath
++
++# 2) Add handy PowerShell commands (aliases) into your PowerShell profile
++#    - cram  : go to the project folder
++#    - cramdev : go to the folder and run the dev server
++$profilePath = $PROFILE
++if (-not (Test-Path $profilePath)) {
++  New-Item -ItemType File -Path $profilePath -Force | Out-Null
++}
++
++$profileBlock = @"
++# ==== Dip or Dive shortcuts (added by setup-shortcuts.ps1) ====
++function cram { Set-Location "$RepoPath" }
++function cramdev { Set-Location "$RepoPath"; npm run dev }
++Set-Alias c cram
++# ==============================================================
++"@
++
++Add-Content -Path $profilePath -Value $profileBlock
++Write-Host "Updated PowerShell profile:" $profilePath
++
++Write-Host "Done. New commands available in NEW PowerShell windows:"
++Write-Host " - cram     (jump to project folder)"
++Write-Host " - cramdev  (jump and start dev server)"
++Write-Host "Or double-click dev.bat inside the project folder."

@@ -12,6 +12,8 @@ import { ErrorBoundary } from './components/ErrorBoundary'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Settings, Flame, Gauge } from 'lucide-react'
+import { Link } from 'react-router-dom'  // [Link = in-app navigation]
+
 
 function DifficultyBadge({ k, active, onClick }: { k: keyof typeof DIFFICULTY, active: boolean, onClick: () => void }) {
   const d = DIFFICULTY[k]
@@ -70,6 +72,13 @@ function App() {
           <DifficultyBadge k="med"  active={state.difficulty==='med'}  onClick={() => dispatch({ type: 'setDifficulty', value: 'med'  })} />
           <DifficultyBadge k="hard" active={state.difficulty==='hard'} onClick={() => dispatch({ type: 'setDifficulty', value: 'hard' })} />
           <DifficultyBadge k="tri"  active={state.difficulty==='tri'}  onClick={() => dispatch({ type: 'setDifficulty', value: 'tri'  })} />
+          {/* Notes link (navigation to /notes) */}
+          <Link
+            to="/notes"
+            className="ml-2 px-3 py-1 rounded-xl border border-slate-700 bg-slate-900 hover:bg-slate-800 text-xs"
+          >
+            Notes
+          </Link>
           <button onClick={() => setSettingsOpen(true)} className="ml-2 p-2 rounded-xl bg-slate-900 border border-slate-800">
             <Settings className="w-5 h-5" />
           </button>
