@@ -25,7 +25,7 @@ new file mode 100644
 +      <div className="text-sm font-semibold">My Notes</div>
 +      <textarea
 +        className="w-full min-h-[120px] bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm"
-+        placeholder="Jot quick bullets or a summary for this section…"
++        placeholder="Jot quick bullets or a summary for this section..."
 +        value={val}
 +        onChange={(e) => setVal(e.target.value)}
 +      />
