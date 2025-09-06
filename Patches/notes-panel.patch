@@ -60,7 +60,7 @@ diff --git a/src/components/StepCard.tsx b/src/components/StepCard.tsx
  
  type Props = {
    section: Section
-@@ -22,12 +23,16 @@ export default function StepCard({ section, instructions, promptsToShow, done, o
+@@ -22,8 +23,12 @@ export default function StepCard({ section, instructions, promptsToShow, done, o
        <div className="grid sm:grid-cols-2 gap-3">
          {prompts.map((p, i) => (
            <PromptCard key={i} label={p.label} text={p.text} instructions={instructions} />
@@ -75,4 +75,3 @@ diff --git a/src/components/StepCard.tsx b/src/components/StepCard.tsx
            className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600">
            {done ? 'Marked Done ✓' : 'Mark Step Done'}
          </button>
-       </div>
