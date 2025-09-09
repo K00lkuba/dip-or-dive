@@ -13,6 +13,7 @@ import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Settings, Flame, Gauge } from 'lucide-react'
 import { Link } from 'react-router-dom'  // [Link = in-app navigation]
+import FlipCard from './components/FlipCard'
 
 
 function DifficultyBadge({ k, active, onClick }: { k: keyof typeof DIFFICULTY, active: boolean, onClick: () => void }) {
@@ -86,6 +87,12 @@ function App() {
       </header>
 
       <div className="grid grid-cols-1 gap-3">
+        <div className="flex items-center justify-center py-2">
+          <FlipCard
+            question="What is the time complexity of binary search?"
+            answer="O(log n) — halving the search space each step."
+          />
+        </div>
         <Pager
           index={state.index}
           total={sections.length}
