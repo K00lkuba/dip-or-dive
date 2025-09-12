@@ -13,11 +13,12 @@ function shuffle<T>(arr: T[], seed = Date.now()): T[] {
   return a;
 }
 
-type QuickfireGameProps = {
+export type QuickfireGameProps = {
   questions: MCQ[];
   totalQuestions?: number;   // default 5
   totalSeconds?: number;     // default 25
   revealDelayMs?: number;    // default 600
+  onExit?: () => void;       // called from results "Close"
 };
 
 export default function QuickfireGame({
@@ -25,6 +26,7 @@ export default function QuickfireGame({
   totalQuestions = 5,
   totalSeconds = 25,
   revealDelayMs = 600,
+  onExit,
 }: QuickfireGameProps) {
   const roundQs = useMemo(() => {
     const pick = Math.min(totalQuestions, questions.length);
@@ -36,7 +38,6 @@ export default function QuickfireGame({
   const [timeLeft, setTimeLeft] = useState(totalSeconds);
   const [selected, setSelected] = useState<number | null>(null);
   const [finished, setFinished] = useState(false);
-  const [startedKey, setStartedKey] = useState(0); // forces restart
 
   const finishedRef = useRef(finished);
   finishedRef.current = finished;
@@ -58,7 +59,7 @@ export default function QuickfireGame({
       });
     }, 1000);
     return () => window.clearInterval(id);
-  }, [finished, startedKey]);
+  }, [finished, totalSeconds]);
 
   // Keyboard shortcuts: 1..4 select, Enter repeats last selection (no-op when locked)
   useEffect(() => {
@@ -102,7 +103,6 @@ export default function QuickfireGame({
     setTimeLeft(totalSeconds);
     setFinished(false);
     setSelected(null);
-    setStartedKey((k) => k + 1);
   };
 
   // Progress bar width
@@ -120,12 +120,22 @@ export default function QuickfireGame({
         <p className="text-lg">
           You scored <span className="font-bold">{score}</span> / {total}.
         </p>
-        <button
-          onClick={restart}
-          className="mt-4 px-4 py-2 rounded-xl border bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-        >
-          Play again
-        </button>
+        <div className="mt-4 flex items-center gap-2">
+          <button
+            onClick={restart}
+            className="px-4 py-2 rounded-xl border bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+          >
+            Play again
+          </button>
+          {onExit && (
+            <button
+              onClick={onExit}
+              className="px-4 py-2 rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            >
+              Close
+            </button>
+          )}
+        </div>
       </Card>
     );
   }
