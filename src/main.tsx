@@ -5,6 +5,7 @@ import App from './App'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import NotesPage from './pages/NotesPage'
 import QuickfirePage from './features/quickfire/QuickfirePage'
+import { QuickfireFAB } from './features/quickfire'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
@@ -15,5 +16,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <Route path="/study/quickfire" element={<QuickfirePage />} />
       </Routes>
     </BrowserRouter>
+    {/* Always-visible Start Quiz button */}
+    <QuickfireFAB />
   </React.StrictMode>
 )
