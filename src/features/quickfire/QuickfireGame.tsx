@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { MCQ } from "./types";
-import Card from "../../components/ui/Card";
 
 function shuffle<T>(arr: T[], seed = Date.now()): T[] {
   const a = arr.slice();
@@ -45,7 +44,7 @@ export default function QuickfireGame({
   const total = roundQs.length;
   const current = roundQs[idx];
 
-  // Countdown
+  // Global 25s countdown
   useEffect(() => {
     if (finished) return;
     const id = window.setInterval(() => {
@@ -59,9 +58,9 @@ export default function QuickfireGame({
       });
     }, 1000);
     return () => window.clearInterval(id);
-  }, [finished, totalSeconds]);
+  }, [finished]);
 
-  // Keyboard shortcuts: 1..4 select, Enter repeats last selection (no-op when locked)
+  // 1..9 keyboard to answer
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (finishedRef.current) return;
@@ -110,58 +109,50 @@ export default function QuickfireGame({
 
   if (finished || timeLeft <= 0) {
     return (
-      <Card className="max-w-3xl mx-auto">
+      <div className="max-w-3xl mx-auto rounded-2xl border p-6 bg-white dark:bg-white text-black">
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-xl md:text-2xl font-bold">Quickfire Results</h2>
-          <span className="text-sm text-gray-600 dark:text-gray-300">
-            Time: {totalSeconds - timeLeft}s
-          </span>
+          <span className="text-sm">Time: {Math.min(totalSeconds, totalSeconds - timeLeft)}s</span>
         </div>
         <p className="text-lg">
           You scored <span className="font-bold">{score}</span> / {total}.
         </p>
-        <div className="mt-4 flex items-center gap-2">
+        <div className="mt-4">
           <button
-            onClick={restart}
-            className="px-4 py-2 rounded-xl border bg-blue-600 text-white hover:bg-blue-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            onClick={onExit}
+            className="px-4 py-2 rounded-xl border focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
           >
-            Play again
+            Close
           </button>
-          {onExit && (
-            <button
-              onClick={onExit}
-              className="px-4 py-2 rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
-            >
-              Close
-            </button>
-          )}
         </div>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <div className="max-w-3xl mx-auto space-y-4">
+    <div className="max-w-3xl mx-auto space-y-4 text-black">
       <div className="flex items-center justify-between">
         <h2 className="text-xl md:text-2xl font-bold">Quickfire MCQ</h2>
-        <div className="text-sm text-gray-600 dark:text-gray-300">
+        <div className="text-sm">
           {idx + 1} / {total}
         </div>
       </div>
 
       <div aria-label="time remaining" className="w-full">
-        <div className="h-2 rounded-full bg-gray-200 dark:bg-gray-800 overflow-hidden">
+        <div className="h-2 rounded-full bg-gray-200 overflow-hidden">
           <div
-            className="h-2 bg-emerald-500 transition-[width] duration-100"
+            className="h-2 transition-[width] duration-100 bg-emerald-500"
             style={{ width: `${pct}%` }}
           />
         </div>
-        <div className="mt-1 text-xs text-right text-gray-600 dark:text-gray-300">
-          {timeLeft}s left
-        </div>
+        <div className="mt-1 text-xs text-right">{timeLeft}s left</div>
       </div>
 
-      <Card role="group" aria-roledescription="Question">
+      <div
+        role="group"
+        aria-roledescription="Question"
+        className="rounded-2xl border p-6 bg-white dark:bg-white"
+      >
         <div className="text-lg md:text-xl font-semibold mb-4">{current.prompt}</div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-3" aria-live="polite">
           {current.options.map((opt, i) => {
@@ -179,15 +170,14 @@ export default function QuickfireGame({
                 className={[
                   "w-full text-left px-4 py-3 rounded-xl border focus:outline-none focus-visible:ring-2",
                   "transition-colors",
-                  selected === null
-                    ? "hover:bg-gray-50 dark:hover:bg-gray-800"
-                    : "",
+                  selected === null ? "hover:bg-gray-50" : "",
                   isCorrect
-                    ? "border-emerald-600 bg-emerald-50 dark:bg-emerald-900/40"
+                    ? "border-emerald-600 bg-emerald-50"
                     : isWrong
-                    ? "border-rose-600 bg-rose-50 dark:bg-rose-900/40"
-                    : "border-gray-300 dark:border-gray-700",
+                    ? "border-rose-600 bg-rose-50"
+                    : "border-gray-300",
                   "focus-visible:ring-blue-500",
+                  "text-black",
                 ].join(" ")}
                 aria-disabled={selected !== null}
                 aria-pressed={isSelected}
@@ -202,18 +192,14 @@ export default function QuickfireGame({
           {selected !== null && (
             <span className="text-sm">
               {selected === current.answerIndex ? (
-                <span className="text-emerald-700 dark:text-emerald-400 font-medium">
-                  Correct!
-                </span>
+                <span className="text-emerald-700 font-medium">Correct!</span>
               ) : (
-                <span className="text-rose-700 dark:text-rose-400 font-medium">
-                  Wrong — correct answer is {current.options[current.answerIndex]}.
-                </span>
+                <span className="text-rose-700 font-medium">Wrong — correct answer is {current.options[current.answerIndex]}.</span>
               )}
             </span>
           )}
         </div>
-      </Card>
+      </div>
     </div>
   );
 }
