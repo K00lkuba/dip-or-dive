@@ -1,18 +1,21 @@
-import React from "react";
+import type { PropsWithChildren, HTMLAttributes } from "react";
 
-type Props = React.PropsWithChildren<{ className?: string }>;
+type CardProps = PropsWithChildren<HTMLAttributes<HTMLDivElement>>;
 
-export default function Card({ className, children }: Props) {
+export function Card({ children, className = "", ...rest }: CardProps) {
   return (
     <div
-      className={
-        "rounded-2xl shadow-lg border border-black/5 bg-white text-slate-900 " +
-        (className ?? "")
-      }
+      {...rest}
+      className={[
+        "rounded-2xl shadow-md border border-gray-200 bg-white/90",
+        "dark:bg-gray-900/80 dark:border-gray-800",
+        "p-4 md:p-6",
+        className,
+      ].join(" ")}
     >
       {children}
     </div>
   );
 }
-
+export default Card;
 
