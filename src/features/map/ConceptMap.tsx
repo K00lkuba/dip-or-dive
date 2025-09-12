@@ -75,10 +75,7 @@ function countKnownInSubtopics(subtopics: Subtopic[], known: KnownMap) {
 function Caret({ open }: { open: boolean }) {
   return (
     <svg
-      className={[
-        "h-4 w-4 transition-transform duration-200",
-        open ? "rotate-90" : "rotate-0",
-      ].join(" ")}
+      className={["h-4 w-4 transition-transform duration-200", open ? "rotate-90" : ""].join(" ")}
       viewBox="0 0 20 20"
       fill="currentColor"
       aria-hidden="true"
@@ -98,16 +95,16 @@ function CardRow({
   onToggle: () => void;
 }) {
   return (
-    <li className="flex items-center justify-between rounded-xl border p-3 hover:bg-gray-50 dark:hover:bg-gray-800/40">
-      <span className="text-sm md:text-base">{card.title}</span>
+    <li className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 p-3 bg-white dark:bg-slate-900 shadow-sm">
+      <span className="text-sm md:text-base text-slate-800 dark:text-slate-100">{card.title}</span>
       <button
         onClick={onToggle}
         className={[
-          "ml-3 inline-flex items-center gap-1 rounded-lg border px-2.5 py-1 text-xs md:text-sm",
+          "ml-3 inline-flex items-center gap-1 rounded-lg px-3 py-1.5 text-xs md:text-sm font-medium",
+          "focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 border",
           isKnown
-            ? "bg-emerald-600 text-white hover:bg-emerald-700"
-            : "bg-white dark:bg-gray-900 hover:bg-gray-50 dark:hover:bg-gray-800",
-          "focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500",
+            ? "bg-emerald-600 text-white border-emerald-600 hover:bg-emerald-700"
+            : "bg-indigo-600 text-white border-indigo-600 hover:bg-indigo-700",
         ].join(" ")}
         aria-pressed={isKnown}
         aria-label={isKnown ? "Mark unknown" : "Mark known"}
@@ -142,10 +139,10 @@ function SubtopicNode({
   const panelId = `sub-${sub.id}-panel`;
 
   return (
-    <li className="rounded-2xl border">
+    <li className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-900 shadow-sm">
       <button
         onClick={() => onToggleCollapsed(sub.id)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left"
+        className="w-full flex items-center justify-between px-4 py-3 text-left text-slate-900 dark:text-slate-100 hover:from-slate-100 hover:bg-slate-50/40 dark:hover:bg-slate-700/40"
         aria-expanded={!isCollapsed}
         aria-controls={panelId}
       >
@@ -194,10 +191,10 @@ function TopicNode({
   const panelId = `top-${topic.id}-panel`;
 
   return (
-    <li className="rounded-2xl border bg-white/90 dark:bg-gray-900/80">
+    <li className="rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden bg-white dark:bg-slate-900 shadow-sm">
       <button
         onClick={() => onToggleCollapsed(topic.id)}
-        className="w-full flex items-center justify-between px-4 py-3 text-left rounded-t-2xl"
+        className="w-full flex items-center justify-between px-4 py-3 text-left bg-gradient-to-r from-indigo-50 to-white dark:from-slate-800 dark:to-slate-900 text-slate-900 dark:text-slate-100 hover:from-indigo-100 dark:hover:from-slate-700"
         aria-expanded={!isCollapsed}
         aria-controls={panelId}
       >
@@ -208,7 +205,7 @@ function TopicNode({
         <ProgressPill known={knownCount} total={total} />
       </button>
       <div id={panelId} role="region" hidden={isCollapsed} className="px-4 pb-4">
-        <ul className="mt-2 space-y-3">
+        <ul className="mt-3 space-y-3">
           {topic.subtopics.map((st) => (
             <SubtopicNode
               key={st.id}
@@ -249,41 +246,39 @@ export default function ConceptMap({ topics, mapId = "default", startExpanded = 
 
   const expandAll = (open: boolean) => {
     const next: CollapsedMap = {};
-    const visit = (t: Topic) => {
+    topics.forEach((t) => {
       next[t.id] = !open;
-      t.subtopics.forEach((st) => {
-        next[st.id] = !open;
-      });
-    };
-    topics.forEach(visit);
+      t.subtopics.forEach((st) => (next[st.id] = !open));
+    });
     save(`${mapId}:collapsed`, next);
     setAllOpen(open);
     window.location.reload();
   };
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-4 text-slate-900 dark:text-slate-100">
       <header className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-2xl font-bold">Concept Map</h1>
         <div className="flex items-center gap-2">
           <ProgressPill known={knownCards} total={totalCards} />
           <button
             onClick={() => expandAll(true)}
-            className="rounded-lg border px-2.5 py-1 text-xs hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="rounded-full border px-3 py-1 text-xs bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             aria-label="Expand all"
           >
             Expand all
           </button>
           <button
             onClick={() => expandAll(false)}
-            className="rounded-lg border px-2.5 py-1 text-xs hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="rounded-full border px-3 py-1 text-xs bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
             aria-label="Collapse all"
           >
             Collapse all
           </button>
           <button
             onClick={resetProgress}
-            className="rounded-lg border px-2.5 py-1 text-xs hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500"
+            className="rounded-full border px-3 py-1 text-xs bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-rose-500"
+            title="Clear known/unknown for this map"
           >
             Reset progress
           </button>
