@@ -4,9 +4,9 @@ import './index.css'
 import App from './App'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import NotesPage from './pages/NotesPage'
-import QuickfirePage from './features/quickfire/QuickfirePage'
-/** ⬇️ Add the Concept Map demo route */
-import { ConceptMapPage } from './features/map'
+
+/** ⬇️ Concept Map imports */
+import { ConceptMapPage, MapFAB } from './features/map'
 import { QuickfireFAB } from './features/quickfire'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
@@ -15,9 +15,12 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/notes" element={<NotesPage />} />
-        <Route path="/study/quickfire" element={<QuickfirePage />} />
+        {/* ⬇️ New route to view the Concept Map */}
         <Route path="/study/map" element={<ConceptMapPage />} />
       </Routes>
+
+      {/* ⬇️ Floating link so you can reach the map from any page */}
+      <MapFAB />
     </BrowserRouter>
     {/* Always-visible Start Quiz button */}
     <QuickfireFAB />
