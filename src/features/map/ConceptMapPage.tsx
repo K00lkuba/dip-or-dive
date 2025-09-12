@@ -1,16 +1,22 @@
 import React from "react";
 import ConceptMap from "./ConceptMap";
 import ConceptTree from "./ConceptTree";
+import ConceptTreeUp from "./ConceptTreeUp";
 import { respiratoryConcepts } from "./sample";
 import { useSearchParams } from "react-router-dom";
 
 export default function ConceptMapPage() {
   const [params, setParams] = useSearchParams();
-  const view = params.get("view") === "tree" ? "tree" : "outline";
-  const switchView = (v: "outline" | "tree") => {
+  const view = params.get("view") === "tree"
+    ? "tree"
+    : params.get("view") === "trunk"
+    ? "trunk"
+    : "outline";
+
+  const switchView = (v: "outline" | "tree" | "trunk") => {
     const next = new URLSearchParams(params);
-    if (v === "tree") next.set("view", "tree");
-    else next.delete("view");
+    if (v === "outline") next.delete("view");
+    else next.set("view", v === "tree" ? "tree" : "trunk");
     setParams(next, { replace: true });
   };
 
@@ -39,11 +45,23 @@ export default function ConceptMapPage() {
           >
             Tree
           </button>
+          <button
+            onClick={() => switchView("trunk")}
+            aria-pressed={view === "trunk"}
+            className={[
+              "px-3 py-1.5 text-sm rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500",
+              view === "trunk" ? "bg-indigo-600 text-white" : "hover:bg-slate-50 dark:hover:bg-slate-800",
+            ].join(" ")}
+          >
+            Trunk
+          </button>
         </div>
       </header>
 
       {view === "tree" ? (
         <ConceptTree topics={respiratoryConcepts} mapId="respiratory" startExpanded={true} height={640} />
+      ) : view === "trunk" ? (
+        <ConceptTreeUp topics={respiratoryConcepts} mapId="respiratory" startExpanded={true} height={720} width={1200} />
       ) : (
         <ConceptMap topics={respiratoryConcepts} mapId="respiratory" startExpanded={true} />
       )}
