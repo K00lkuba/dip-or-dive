@@ -134,7 +134,7 @@ export default function RadialConceptMap({
   };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900" style={{ touchAction: 'none' }}>
       {/* Simple settings panel */}
       <div className="absolute top-4 right-4 z-10">
         <button

@@ -29,6 +29,7 @@ export const useZoomPan = (): UseZoomPanReturn => {
 
   const handleWheel = useCallback((event: React.WheelEvent<SVGSVGElement>) => {
     event.preventDefault();
+    event.stopPropagation();
     
     const rect = event.currentTarget.getBoundingClientRect();
     const mouseX = event.clientX - rect.left;
@@ -97,8 +98,22 @@ export const useZoomPan = (): UseZoomPanReturn => {
       }
     };
 
+    // Prevent page scroll when wheel is used on the map
+    const handleGlobalWheel = (event: WheelEvent) => {
+      const target = event.target as Element;
+      if (target && target.closest('svg')) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
+
     document.addEventListener('mouseup', handleGlobalMouseUp);
-    return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
+    document.addEventListener('wheel', handleGlobalWheel, { passive: false });
+    
+    return () => {
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+      document.removeEventListener('wheel', handleGlobalWheel);
+    };
   }, []);
 
   return {
