@@ -98,21 +98,10 @@ export const useZoomPan = (): UseZoomPanReturn => {
       }
     };
 
-    // Prevent page scroll when wheel is used on the map
-    const handleGlobalWheel = (event: WheelEvent) => {
-      const target = event.target as Element;
-      if (target && target.closest('svg')) {
-        event.preventDefault();
-        event.stopPropagation();
-      }
-    };
-
     document.addEventListener('mouseup', handleGlobalMouseUp);
-    document.addEventListener('wheel', handleGlobalWheel, { passive: false });
     
     return () => {
       document.removeEventListener('mouseup', handleGlobalMouseUp);
-      document.removeEventListener('wheel', handleGlobalWheel);
     };
   }, []);
 

@@ -134,7 +134,14 @@ export default function RadialConceptMap({
   };
 
   return (
-    <div className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900" style={{ touchAction: 'none' }}>
+    <div 
+      className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900" 
+      style={{ 
+        touchAction: 'none',
+        overscrollBehavior: 'none'
+      }}
+      onWheel={(e) => e.preventDefault()}
+    >
       {/* Simple settings panel */}
       <div className="absolute top-4 right-4 z-10">
         <button
@@ -157,7 +164,11 @@ export default function RadialConceptMap({
         width={W}
         height={H}
         className="w-full h-full cursor-grab"
-        onWheel={handleWheel}
+        onWheel={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          handleWheel(e);
+        }}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
