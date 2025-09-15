@@ -134,7 +134,7 @@ export default function RadialConceptMap({
     setSelectedNode(node);
   };
 
-  // Global wheel event prevention for map area
+  // Global wheel event prevention for map area - but allow zoom to work
   useEffect(() => {
     const handleGlobalWheel = (e: WheelEvent) => {
       const target = e.target as Element;
@@ -142,9 +142,39 @@ export default function RadialConceptMap({
       
       // Check if the wheel event is happening over our map
       if (mapContainer && (mapContainer.contains(target) || mapContainer === target)) {
+        // Prevent page scroll
         e.preventDefault();
         e.stopPropagation();
-        e.stopImmediatePropagation();
+        
+        // Manually call the zoom logic
+        const rect = mapContainer.getBoundingClientRect();
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+        
+        const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
+        const newScale = Math.max(0.1, Math.min(3, scale * scaleFactor));
+        
+        // Zoom to cursor position
+        const scaleChange = newScale / scale;
+        const newTranslateX = mouseX - (mouseX - translateX) * scaleChange;
+        const newTranslateY = mouseY - (mouseY - translateY) * scaleChange;
+        
+        // Update the state directly using the zoom pan hook's state
+        // We need to call the zoom handler instead
+        const svgElement = mapContainer.querySelector('svg');
+        if (svgElement) {
+          const syntheticEvent = {
+            currentTarget: svgElement,
+            clientX: e.clientX,
+            clientY: e.clientY,
+            deltaY: e.deltaY,
+            preventDefault: () => {},
+            stopPropagation: () => {}
+          } as any;
+          
+          handleWheel(syntheticEvent);
+        }
+        
         return false;
       }
     };
@@ -155,31 +185,19 @@ export default function RadialConceptMap({
     return () => {
       document.removeEventListener('wheel', handleGlobalWheel, { capture: true });
     };
-  }, []);
+  }, [scale, translateX, translateY]);
 
   return (
     <div 
-      className="concept-map-wrapper"
-      onWheel={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
-      }}
+      ref={containerRef}
+      className="concept-map-container relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900" 
       style={{ 
+        touchAction: 'none',
+        overscrollBehavior: 'none',
         position: 'relative',
         zIndex: 1
       }}
     >
-      <div 
-        ref={containerRef}
-        className="concept-map-container relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900" 
-        style={{ 
-          touchAction: 'none',
-          overscrollBehavior: 'none',
-          position: 'relative',
-          zIndex: 1
-        }}
-      >
       {/* Simple settings panel */}
       <div className="absolute top-4 right-4 z-10">
         <button
@@ -250,7 +268,6 @@ export default function RadialConceptMap({
           ))}
         </g>
       </svg>
-      </div>
     </div>
   );
 }
