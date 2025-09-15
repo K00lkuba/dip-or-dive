@@ -172,12 +172,7 @@ export default function RadialConceptMap({
       });
     }
     
-    // Add halo info to all stars
-    starList.forEach((star) => {
-      star.hasHalo = true;
-      star.haloSize = star.size * 1.5; // Halo is 1.5x larger than star
-      star.haloBrightness = Math.min(star.brightness * 0.3, 0.4); // Lighter halo
-    });
+    // Stars will use CSS for halos - no need for separate halo data
     
     return starList;
   }, [W, H]);
@@ -297,26 +292,16 @@ export default function RadialConceptMap({
           </defs>
           <rect width="100%" height="100%" fill="url(#backgroundGradient)" />
           
-          {/* Render stars */}
+          {/* Render stars with CSS halos */}
           {stars.map((star) => (
-            <g key={star.id}>
-              {/* Render halo for all stars */}
-              <circle
-                cx={star.x}
-                cy={star.y}
-                r={star.haloSize}
-                fill={`rgba(255, 255, 255, ${star.haloBrightness})`}
-                className="transition-opacity duration-1000"
-              />
-              {/* Render the star itself */}
-              <circle
-                cx={star.x}
-                cy={star.y}
-                r={star.size}
-                fill={`rgba(255, 255, 255, ${star.brightness})`}
-                className="transition-opacity duration-1000"
-              />
-            </g>
+            <circle
+              key={star.id}
+              cx={star.x}
+              cy={star.y}
+              r={star.size}
+              fill={`rgba(255, 255, 255, ${star.brightness})`}
+              className="star-glow transition-opacity duration-1000"
+            />
           ))}
           
           {/* Render connections */}
