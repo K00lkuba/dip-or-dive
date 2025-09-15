@@ -130,6 +130,51 @@ export default function RadialConceptMap({
 
   const allNodes = [centralNode, ...mainCategories, ...concepts];
 
+  // Generate random stars for space background
+  const stars = useMemo(() => {
+    const starList: any[] = [];
+    const numStars = 200;
+    
+    // Create some high-density star clusters
+    const clusters = [
+      { x: W * 0.2, y: H * 0.3, radius: 150, density: 0.3 },
+      { x: W * 0.8, y: H * 0.2, radius: 120, density: 0.25 },
+      { x: W * 0.1, y: H * 0.8, radius: 100, density: 0.2 },
+      { x: W * 0.9, y: H * 0.7, radius: 130, density: 0.35 },
+    ];
+    
+    for (let i = 0; i < numStars; i++) {
+      let x, y, size, brightness;
+      
+      // 60% chance to be in a cluster
+      if (Math.random() < 0.6) {
+        const cluster = clusters[Math.floor(Math.random() * clusters.length)];
+        const angle = Math.random() * 2 * Math.PI;
+        const distance = Math.random() * cluster.radius;
+        x = cluster.x + Math.cos(angle) * distance;
+        y = cluster.y + Math.sin(angle) * distance;
+        size = Math.random() * 2 + 0.5; // Slightly larger in clusters
+        brightness = Math.random() * 0.8 + 0.2; // Brighter in clusters
+      } else {
+        // Random distribution across the entire map
+        x = Math.random() * W;
+        y = Math.random() * H;
+        size = Math.random() * 1.5 + 0.3;
+        brightness = Math.random() * 0.6 + 0.1; // Dimmer outside clusters
+      }
+      
+      starList.push({
+        id: `star-${i}`,
+        x,
+        y,
+        size,
+        brightness,
+      });
+    }
+    
+    return starList;
+  }, [W, H]);
+
   const handleNodeClick = (node: any) => {
     setSelectedNode(node);
   };
@@ -190,7 +235,7 @@ export default function RadialConceptMap({
   return (
     <div 
       ref={containerRef}
-      className="concept-map-container relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900" 
+      className="concept-map-container relative overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900" 
       style={{ 
         touchAction: 'none',
         overscrollBehavior: 'none',
@@ -237,12 +282,26 @@ export default function RadialConceptMap({
           {/* Simple gradient background */}
           <defs>
             <radialGradient id="backgroundGradient" cx="50%" cy="50%" r="50%">
-              <stop offset="0%" stopColor="#1e293b" />
-              <stop offset="50%" stopColor="#1e3a8a" />
-              <stop offset="100%" stopColor="#0f172a" />
+              <stop offset="0%" stopColor="#0c0a2e" />
+              <stop offset="30%" stopColor="#1a1a2e" />
+              <stop offset="60%" stopColor="#16213e" />
+              <stop offset="100%" stopColor="#0f0f23" />
             </radialGradient>
           </defs>
           <rect width="100%" height="100%" fill="url(#backgroundGradient)" />
+          
+          {/* Render stars */}
+          {stars.map((star) => (
+            <circle
+              key={star.id}
+              cx={star.x}
+              cy={star.y}
+              r={star.size}
+              fill={`rgba(255, 255, 255, ${star.brightness})`}
+              className="transition-opacity duration-1000"
+            />
+          ))}
+          
           {/* Render connections */}
           {connections.map((connection) => (
             <ConceptConnectionRenderer
