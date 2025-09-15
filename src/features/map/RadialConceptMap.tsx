@@ -133,7 +133,7 @@ export default function RadialConceptMap({
   // Generate random stars for space background
   const stars = useMemo(() => {
     const starList: any[] = [];
-    const numStars = 400;
+    const numStars = 1000;
     
     // Create some high-density star clusters
     const clusters = [
