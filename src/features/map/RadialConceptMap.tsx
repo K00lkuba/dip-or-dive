@@ -172,6 +172,20 @@ export default function RadialConceptMap({
       });
     }
     
+    // Sort stars by size and add halo info to largest 20%
+    starList.sort((a, b) => b.size - a.size);
+    const haloCount = Math.floor(numStars * 0.2);
+    
+    starList.forEach((star, index) => {
+      if (index < haloCount) {
+        star.hasHalo = true;
+        star.haloSize = star.size * 2.5; // Halo is 2.5x larger than star
+        star.haloBrightness = Math.min(star.brightness * 0.3, 0.4); // Lighter halo
+      } else {
+        star.hasHalo = false;
+      }
+    });
+    
     return starList;
   }, [W, H]);
 
@@ -292,14 +306,26 @@ export default function RadialConceptMap({
           
           {/* Render stars */}
           {stars.map((star) => (
-            <circle
-              key={star.id}
-              cx={star.x}
-              cy={star.y}
-              r={star.size}
-              fill={`rgba(255, 255, 255, ${star.brightness})`}
-              className="transition-opacity duration-1000"
-            />
+            <g key={star.id}>
+              {/* Render halo for largest 20% of stars */}
+              {star.hasHalo && (
+                <circle
+                  cx={star.x}
+                  cy={star.y}
+                  r={star.haloSize}
+                  fill={`rgba(255, 255, 255, ${star.haloBrightness})`}
+                  className="transition-opacity duration-1000"
+                />
+              )}
+              {/* Render the star itself */}
+              <circle
+                cx={star.x}
+                cy={star.y}
+                r={star.size}
+                fill={`rgba(255, 255, 255, ${star.brightness})`}
+                className="transition-opacity duration-1000"
+              />
+            </g>
           ))}
           
           {/* Render connections */}
