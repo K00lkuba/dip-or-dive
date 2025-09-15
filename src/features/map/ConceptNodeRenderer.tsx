@@ -44,7 +44,7 @@ export const ConceptNodeRenderer: React.FC<ConceptNodeRendererProps> = ({
         stroke={isCentral ? '#f59e0b' : isSelected ? '#1d4ed8' : '#374151'}
         strokeWidth={isSelected || isCentral ? 3 : 2}
         filter={isCentral ? 'url(#glow)' : undefined}
-        className="transition-all duration-200 hover:scale-110"
+        className="transition-all duration-200"
       />
       
       {/* Progress ring */}

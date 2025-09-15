@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 interface ZoomPanState {
   scale: number;
@@ -13,7 +13,7 @@ interface UseZoomPanReturn {
   handleWheel: (event: React.WheelEvent<SVGSVGElement>) => void;
   handleMouseDown: (event: React.MouseEvent<SVGSVGElement>) => void;
   handleMouseMove: (event: React.MouseEvent<SVGSVGElement>) => void;
-  handleMouseUp: () => void;
+  handleMouseUp: (event: React.MouseEvent<SVGSVGElement>) => void;
   resetView: () => void;
 }
 
@@ -51,6 +51,7 @@ export const useZoomPan = (): UseZoomPanReturn => {
 
   const handleMouseDown = useCallback((event: React.MouseEvent<SVGSVGElement>) => {
     if (event.button === 0) { // Left click only
+      event.preventDefault();
       isDragging.current = true;
       lastMousePos.current = { x: event.clientX, y: event.clientY };
       event.currentTarget.style.cursor = 'grabbing';
@@ -72,9 +73,11 @@ export const useZoomPan = (): UseZoomPanReturn => {
     }
   }, []);
 
-  const handleMouseUp = useCallback(() => {
-    isDragging.current = false;
-    document.body.style.cursor = 'default';
+  const handleMouseUp = useCallback((event: React.MouseEvent<SVGSVGElement>) => {
+    if (isDragging.current) {
+      isDragging.current = false;
+      event.currentTarget.style.cursor = 'grab';
+    }
   }, []);
 
   const resetView = useCallback(() => {
@@ -83,6 +86,19 @@ export const useZoomPan = (): UseZoomPanReturn => {
       translateX: 0,
       translateY: 0,
     });
+  }, []);
+
+  // Global mouse up listener to handle dragging outside the SVG
+  useEffect(() => {
+    const handleGlobalMouseUp = () => {
+      if (isDragging.current) {
+        isDragging.current = false;
+        document.body.style.cursor = 'default';
+      }
+    };
+
+    document.addEventListener('mouseup', handleGlobalMouseUp);
+    return () => document.removeEventListener('mouseup', handleGlobalMouseUp);
   }, []);
 
   return {

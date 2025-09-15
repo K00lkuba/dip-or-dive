@@ -156,7 +156,11 @@ export default function RadialConceptMap({
       <svg
         width={W}
         height={H}
-        className="w-full h-full"
+        className="w-full h-full cursor-grab"
+        onWheel={handleWheel}
+        onMouseDown={handleMouseDown}
+        onMouseMove={handleMouseMove}
+        onMouseUp={handleMouseUp}
       >
         {/* Simple gradient background */}
         <defs>
@@ -171,11 +175,7 @@ export default function RadialConceptMap({
         {/* Only concept map nodes move - background stays fixed */}
         <g
           transform={`translate(${translateX}, ${translateY}) scale(${scale})`}
-          style={{ transformOrigin: '0 0', cursor: 'grab' }}
-          onWheel={handleWheel}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
+          style={{ transformOrigin: '0 0' }}
         >
           {/* Render connections */}
           {connections.map((connection) => (
