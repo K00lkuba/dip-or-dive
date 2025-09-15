@@ -229,21 +229,20 @@ export default function RadialConceptMap({
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
       >
-        {/* Simple gradient background */}
-        <defs>
-          <radialGradient id="backgroundGradient" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#1e293b" />
-            <stop offset="50%" stopColor="#1e3a8a" />
-            <stop offset="100%" stopColor="#0f172a" />
-          </radialGradient>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#backgroundGradient)" />
-        
-        {/* Only concept map nodes move - background stays fixed */}
+        {/* Background and content move together */}
         <g
           transform={`translate(${translateX}, ${translateY}) scale(${scale})`}
           style={{ transformOrigin: '0 0' }}
         >
+          {/* Simple gradient background */}
+          <defs>
+            <radialGradient id="backgroundGradient" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" stopColor="#1e293b" />
+              <stop offset="50%" stopColor="#1e3a8a" />
+              <stop offset="100%" stopColor="#0f172a" />
+            </radialGradient>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#backgroundGradient)" />
           {/* Render connections */}
           {connections.map((connection) => (
             <ConceptConnectionRenderer
