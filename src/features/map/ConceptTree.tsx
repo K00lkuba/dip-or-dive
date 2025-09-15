@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import type { Topic, Subtopic, CardItem } from "./types";
+import type { Topic, Subtopic, Card } from "./types";
 import ProgressPill from "./ProgressPill";
 
 /** ----- Shared localStorage (same namespace as ConceptMap) ----- */
@@ -342,3 +342,4 @@ export default function ConceptTree({
     </ProgressCtx.Provider>
   );
 }
+

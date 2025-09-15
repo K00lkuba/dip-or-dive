@@ -1,32 +1,27 @@
 import React from "react";
 
-type ProgressPillProps = { known: number; total: number; className?: string };
-
-export function ProgressPill({ known, total, className = "" }: ProgressPillProps) {
-  const pct = total > 0 ? (known / total) * 100 : 0;
-  const tone =
-    total === 0
-      ? "bg-slate-200 text-slate-700 border-slate-300"
-      : pct >= 80
-      ? "bg-emerald-100 text-emerald-700 border-emerald-200"
-      : pct >= 50
-      ? "bg-amber-100 text-amber-800 border-amber-200"
-      : "bg-rose-100 text-rose-700 border-rose-200";
-  return (
-    <span
-      className={[
-        "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold",
-        "border shadow-sm",
-        tone,
-        className,
-      ].join(" ")}
-      aria-label={`Progress ${known} of ${total}`}
-    >
-      {known}/{total}
-    </span>
-  );
+interface ProgressPillProps {
+  known: number;
+  total: number;
+  className?: string;
 }
 
-export default ProgressPill;
+export default function ProgressPill({ known, total, className = "" }: ProgressPillProps) {
+  const percentage = total > 0 ? Math.round((known / total) * 100) : 0;
+  
+  const getProgressColor = (percentage: number) => {
+    if (percentage === 100) return "bg-emerald-500 text-white";
+    if (percentage >= 75) return "bg-blue-500 text-white";
+    if (percentage >= 50) return "bg-yellow-500 text-black";
+    if (percentage >= 25) return "bg-orange-500 text-white";
+    return "bg-red-500 text-white";
+  };
 
+  return (
+    <div className={`inline-flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium ${getProgressColor(percentage)} ${className}`}>
+      <span className="text-[10px]">{known}/{total}</span>
+      <span className="text-[10px] opacity-75">({percentage}%)</span>
+    </div>
+  );
+}
 

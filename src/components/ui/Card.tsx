@@ -2,7 +2,7 @@ import type { PropsWithChildren, HTMLAttributes } from "react";
 
 type CardProps = PropsWithChildren<HTMLAttributes<HTMLDivElement>>;
 
-export function Card({ children, className = "", ...rest }: CardProps) {
+function Card({ children, className = "", ...rest }: CardProps) {
   return (
     <div
       {...rest}

@@ -1,18 +1,29 @@
-export type CardItem = {
+export interface Card {
   id: string;
   title: string;
-};
+  content?: string;
+}
 
-export type Subtopic = {
+export interface Subtopic {
   id: string;
   title: string;
-  cards: CardItem[];
-};
+  cards: Card[];
+}
 
-export type Topic = {
+export interface Topic {
   id: string;
   title: string;
   subtopics: Subtopic[];
-};
+}
 
+
+export interface ConceptNode {
+  id: string;
+  x: number;
+  y: number;
+  radius: number;
+  label: string;
+  progress: number;
+  categoryId?: number;
+}
 

@@ -1,0 +1,10 @@
+[33m4a48f7c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m feat(map): enhance ConceptTreeUp with organic styling and improved layout
+[33mb7360ed[m feat(map): add ConceptTreeUp bottom-up tree view with trunk layout
+[33m34b2d3f[m feat(map): add ConceptTree view with hierarchical layout and view switcher
+[33m52efa1b[m style(map): improve Concept Map UI with gradients, shadows, and better contrast
+[33mc92db79[m feat(map): add floating MapFAB for easy navigation to Concept Map
+[33mbff876c[m feat(map): add Concept Map with progress tracking and demo route /study/map
+[33mc734e1e[m feat(quickfire): switch to white theme modal, update sample MCQs (resp physiology)
+[33m9e9b55a[m feat(quickfire): add floating Quickfire FAB with modal and sample questions
+[33m9ff849f[m feat(quickfire): add onExit action, simplify timer, polish results actions
+[33m97361a5[m feat(quickfire): add Quickfire MCQ mode, route, and Card improvements
