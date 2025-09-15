@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import type { Topic, Subtopic } from "./types";
 import { ConceptNodeRenderer } from "./ConceptNodeRenderer";
 import { ConceptConnectionRenderer } from "./ConceptConnectionRenderer";
@@ -19,6 +19,7 @@ export default function RadialConceptMap({
   width = 1200,
 }: RadialConceptMapProps) {
   const [selectedNode, setSelectedNode] = useState<any>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   
   const {
     scale,
@@ -133,14 +134,39 @@ export default function RadialConceptMap({
     setSelectedNode(node);
   };
 
+  // Aggressive wheel event prevention
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      e.stopImmediatePropagation();
+      return false;
+    };
+
+    // Add event listener with capture phase
+    container.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    
+    return () => {
+      container.removeEventListener('wheel', handleWheel, { capture: true });
+    };
+  }, []);
+
   return (
     <div 
+      ref={containerRef}
       className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900" 
       style={{ 
         touchAction: 'none',
         overscrollBehavior: 'none'
       }}
-      onWheel={(e) => e.preventDefault()}
+      onWheel={(e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }}
     >
       {/* Simple settings panel */}
       <div className="absolute top-4 right-4 z-10">
