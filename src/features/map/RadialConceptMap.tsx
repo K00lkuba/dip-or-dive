@@ -244,7 +244,7 @@ export default function RadialConceptMap({
       ref={containerRef}
       className="concept-map-container relative overflow-hidden"
       style={{ 
-        background: 'radial-gradient(circle at center, #0c0a2e 0%, #1a1a2e 30%, #16213e 60%, #0f0f23 100%)',
+        background: '#0f0f23', // Same as the outer edge of the map gradient
         touchAction: 'none',
         overscrollBehavior: 'none',
         position: 'relative',
