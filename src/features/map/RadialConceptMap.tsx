@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import type { Topic, Subtopic } from "./types";
 import { ConceptNodeRenderer } from "./ConceptNodeRenderer";
 import { ConceptConnectionRenderer } from "./ConceptConnectionRenderer";
@@ -20,6 +21,7 @@ export default function RadialConceptMap({
 }: RadialConceptMapProps) {
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   
   const {
     scale,
@@ -163,12 +165,25 @@ export default function RadialConceptMap({
         brightness = Math.random() * 0.6 + 0.1; // Dimmer outside clusters
       }
       
+      // Determine star color
+      let color: 'white' | 'yellow' | 'orange' | 'red' = 'white';
+      const colorRoll = Math.random();
+      if (colorRoll < 0.1) {
+        color = 'yellow'; // 10% yellow stars
+      } else if (colorRoll < 0.15) {
+        color = 'orange'; // 5% orange stars
+      } else if (colorRoll < 0.2) {
+        color = 'red'; // 5% red stars
+      }
+      // 80% remain white
+      
       starList.push({
         id: `star-${i}`,
         x,
         y,
         size,
         brightness,
+        color,
       });
     }
     
@@ -242,8 +257,9 @@ export default function RadialConceptMap({
   return (
     <div 
       ref={containerRef}
-      className="concept-map-container relative overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900" 
+      className="concept-map-container relative overflow-hidden"
       style={{ 
+        backgroundColor: '#0f0f23',
         touchAction: 'none',
         overscrollBehavior: 'none',
         position: 'relative',
@@ -257,6 +273,19 @@ export default function RadialConceptMap({
           className="px-3 py-2 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-colors"
         >
           Reset View
+        </button>
+      </div>
+      
+      {/* Back to main page button */}
+      <div className="absolute bottom-4 left-4 z-10">
+        <button
+          onClick={() => navigate('/')}
+          className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-colors flex items-center gap-2"
+        >
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M19 12H5M12 19l-7-7 7-7"/>
+          </svg>
+          Back to Main
         </button>
       </div>
       
@@ -298,26 +327,37 @@ export default function RadialConceptMap({
           <rect width="100%" height="100%" fill="url(#backgroundGradient)" />
           
           {/* Render stars */}
-          {stars.map((star) => (
-            <g key={star.id}>
-              {/* Render halo for all stars */}
-              <circle
-                cx={star.x}
-                cy={star.y}
-                r={star.haloSize}
-                fill={`rgba(255, 255, 255, ${star.haloBrightness})`}
-                className="transition-opacity duration-1000"
-              />
-              {/* Render the star itself */}
-              <circle
-                cx={star.x}
-                cy={star.y}
-                r={star.size}
-                fill={`rgba(255, 255, 255, ${star.brightness})`}
-                className="transition-opacity duration-1000"
-              />
-            </g>
-          ))}
+          {stars.map((star) => {
+            const colorMap: Record<string, { star: string; halo: string }> = {
+              white: { star: '255, 255, 255', halo: '255, 255, 255' },
+              yellow: { star: '251, 191, 36', halo: '245, 158, 11' }, // Natural star yellow
+              orange: { star: '251, 146, 60', halo: '234, 88, 12' }, // Natural star orange
+              red: { star: '239, 68, 68', halo: '220, 38, 38' }, // Natural star red
+            };
+            
+            const colors = colorMap[star.color] || colorMap.white;
+            
+            return (
+              <g key={star.id}>
+                {/* Render halo for all stars */}
+                <circle
+                  cx={star.x}
+                  cy={star.y}
+                  r={star.haloSize}
+                  fill={`rgba(${colors.halo}, ${star.haloBrightness})`}
+                  className="transition-opacity duration-1000"
+                />
+                {/* Render the star itself */}
+                <circle
+                  cx={star.x}
+                  cy={star.y}
+                  r={star.size}
+                  fill={`rgba(${colors.star}, ${star.brightness})`}
+                  className="transition-opacity duration-1000"
+                />
+              </g>
+            );
+          })}
           
           {/* Render connections */}
           {connections.map((connection) => (
