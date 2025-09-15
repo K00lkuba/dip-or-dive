@@ -201,58 +201,26 @@ export default function RadialConceptMap({
     setSelectedNode(node);
   };
 
-  // Global wheel event prevention for map area - but allow zoom to work
+  // Prevent page scroll when wheel is over the map container
   useEffect(() => {
     const handleGlobalWheel = (e: WheelEvent) => {
       const target = e.target as Element;
       const mapContainer = containerRef.current;
       
-      // Check if the wheel event is happening over our map
-      if (mapContainer && (mapContainer.contains(target) || mapContainer === target)) {
-        // Prevent page scroll
+      // Check if the wheel event is happening over our map container (but not the SVG)
+      if (mapContainer && mapContainer.contains(target) && !target.closest('svg')) {
         e.preventDefault();
         e.stopPropagation();
-        
-        // Manually call the zoom logic
-        const rect = mapContainer.getBoundingClientRect();
-        const mouseX = e.clientX - rect.left;
-        const mouseY = e.clientY - rect.top;
-        
-        const scaleFactor = e.deltaY > 0 ? 0.9 : 1.1;
-        const newScale = Math.max(0.1, Math.min(3, scale * scaleFactor));
-        
-        // Zoom to cursor position
-        const scaleChange = newScale / scale;
-        const newTranslateX = mouseX - (mouseX - translateX) * scaleChange;
-        const newTranslateY = mouseY - (mouseY - translateY) * scaleChange;
-        
-        // Update the state directly using the zoom pan hook's state
-        // We need to call the zoom handler instead
-        const svgElement = mapContainer.querySelector('svg');
-        if (svgElement) {
-          const syntheticEvent = {
-            currentTarget: svgElement,
-            clientX: e.clientX,
-            clientY: e.clientY,
-            deltaY: e.deltaY,
-            preventDefault: () => {},
-            stopPropagation: () => {}
-          } as any;
-          
-          handleWheel(syntheticEvent);
-        }
-        
         return false;
       }
     };
 
-    // Add global listener with capture phase
-    document.addEventListener('wheel', handleGlobalWheel, { passive: false, capture: true });
+    document.addEventListener('wheel', handleGlobalWheel, { passive: false });
     
     return () => {
-      document.removeEventListener('wheel', handleGlobalWheel, { capture: true });
+      document.removeEventListener('wheel', handleGlobalWheel);
     };
-  }, [scale, translateX, translateY]);
+  }, []);
 
   return (
     <div 
@@ -277,7 +245,7 @@ export default function RadialConceptMap({
       </div>
       
       {/* Back to main page button */}
-      <div className="absolute bottom-4 left-4 z-10">
+      <div className="fixed bottom-4 left-4 z-10">
         <button
           onClick={() => navigate('/')}
           className="px-4 py-2 bg-white/10 backdrop-blur-sm text-white rounded-lg hover:bg-white/20 transition-colors flex items-center gap-2"
