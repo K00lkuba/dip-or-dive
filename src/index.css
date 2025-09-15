@@ -5,3 +5,14 @@
 :root {
   color-scheme: dark;
 }
+
+/* Prevent scrolling on concept map */
+.concept-map-container {
+  overscroll-behavior: none;
+  touch-action: none;
+}
+
+.concept-map-container * {
+  overscroll-behavior: none;
+  touch-action: none;
+}

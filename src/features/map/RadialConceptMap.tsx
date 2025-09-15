@@ -134,40 +134,52 @@ export default function RadialConceptMap({
     setSelectedNode(node);
   };
 
-  // Aggressive wheel event prevention
+  // Global wheel event prevention for map area
   useEffect(() => {
-    const container = containerRef.current;
-    if (!container) return;
-
-    const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      e.stopImmediatePropagation();
-      return false;
+    const handleGlobalWheel = (e: WheelEvent) => {
+      const target = e.target as Element;
+      const mapContainer = containerRef.current;
+      
+      // Check if the wheel event is happening over our map
+      if (mapContainer && (mapContainer.contains(target) || mapContainer === target)) {
+        e.preventDefault();
+        e.stopPropagation();
+        e.stopImmediatePropagation();
+        return false;
+      }
     };
 
-    // Add event listener with capture phase
-    container.addEventListener('wheel', handleWheel, { passive: false, capture: true });
+    // Add global listener with capture phase
+    document.addEventListener('wheel', handleGlobalWheel, { passive: false, capture: true });
     
     return () => {
-      container.removeEventListener('wheel', handleWheel, { capture: true });
+      document.removeEventListener('wheel', handleGlobalWheel, { capture: true });
     };
   }, []);
 
   return (
     <div 
-      ref={containerRef}
-      className="relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900" 
-      style={{ 
-        touchAction: 'none',
-        overscrollBehavior: 'none'
-      }}
+      className="concept-map-wrapper"
       onWheel={(e) => {
         e.preventDefault();
         e.stopPropagation();
         return false;
       }}
+      style={{ 
+        position: 'relative',
+        zIndex: 1
+      }}
     >
+      <div 
+        ref={containerRef}
+        className="concept-map-container relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900" 
+        style={{ 
+          touchAction: 'none',
+          overscrollBehavior: 'none',
+          position: 'relative',
+          zIndex: 1
+        }}
+      >
       {/* Simple settings panel */}
       <div className="absolute top-4 right-4 z-10">
         <button
@@ -238,6 +250,7 @@ export default function RadialConceptMap({
           ))}
         </g>
       </svg>
+      </div>
     </div>
   );
 }
