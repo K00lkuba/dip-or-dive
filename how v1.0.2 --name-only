@@ -1,0 +1,5 @@
+[33mbb413e4[m[33m ([m[1;36mHEAD[m[33m, [m[1;33mtag: [m[1;33mv1.0.2[m[33m, [m[1;33mtag: [m[1;33mv1.0.1[m[33m, [m[1;31morigin/main[m[33m)[m revert: restore working star halos - CSS optimization caused performance issues
+[33m36e1a1e[m perf(map): optimize star rendering with CSS-based halos - 50% fewer DOM elements
+[33m530ddd7[m feat(map): apply halos to all stars with 1.5x sizing for uniform glow effect
+[33mf15f902[m feat(map): add halos to largest 20% of stars for enhanced visual depth
+[33m8aa3c02[m feat(map): increase star count to 1000 for dense space background

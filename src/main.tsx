@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import NotesPage from "./pages/NotesPage";
 import { ConceptMapPage, MapFAB } from "./features/map";
 import { QuickfireFAB } from "./features/quickfire";
+import { CaseStudyPage, CaseStudyFAB } from "./features/casestudy";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
@@ -14,11 +15,13 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <Route path="/" element={<App />} />
         <Route path="/notes" element={<NotesPage />} />
         <Route path="/study/map" element={<ConceptMapPage />} />
+        <Route path="/study/case/:caseId" element={<CaseStudyPage />} />
       </Routes>
 
       {/* GLOBAL-FABS-ANCHOR: Do not remove MapFAB or QuickfireFAB. */}
       <MapFAB />
       <QuickfireFAB />
+      <CaseStudyFAB />
     </BrowserRouter>
   </React.StrictMode>
 );
