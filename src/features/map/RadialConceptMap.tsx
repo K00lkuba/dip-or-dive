@@ -242,8 +242,9 @@ export default function RadialConceptMap({
   return (
     <div 
       ref={containerRef}
-      className="concept-map-container relative overflow-hidden bg-gradient-to-br from-slate-950 via-purple-950 to-slate-900" 
+      className="concept-map-container relative overflow-hidden"
       style={{ 
+        backgroundColor: '#0f0f23',
         touchAction: 'none',
         overscrollBehavior: 'none',
         position: 'relative',
