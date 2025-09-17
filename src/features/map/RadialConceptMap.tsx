@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import type { Topic, Subtopic } from "./types";
 import { ConceptNodeRenderer } from "./ConceptNodeRenderer";
 import { ConceptConnectionRenderer } from "./ConceptConnectionRenderer";
@@ -20,6 +21,7 @@ export default function RadialConceptMap({
 }: RadialConceptMapProps) {
   const [selectedNode, setSelectedNode] = useState<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   
   const {
     scale,
@@ -184,6 +186,11 @@ export default function RadialConceptMap({
 
   const handleNodeClick = (node: any) => {
     setSelectedNode(node);
+    
+    // Navigate to case study when Category 1 is clicked
+    if (node.id === 0 && node.label === 'Category 1') {
+      navigate('/study/case/1');
+    }
   };
 
   // Global wheel event prevention for map area - but allow zoom to work
@@ -244,7 +251,7 @@ export default function RadialConceptMap({
       ref={containerRef}
       className="concept-map-container relative overflow-hidden"
       style={{ 
-        background: '#0f0f23', // Same as the outer edge of the map gradient
+        backgroundColor: '#0f0f23',
         touchAction: 'none',
         overscrollBehavior: 'none',
         position: 'relative',
