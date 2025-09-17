@@ -3,6 +3,67 @@ import { useParams } from 'react-router-dom';
 import { caseStudy1 } from './sampleData';
 import { CaseStudyState } from './types';
 
+// Helper function to extract key concepts from answers
+const extractKeyConcepts = (answer: string): string[] => {
+  const concepts: string[] = [];
+  
+  // Look for anatomical structures
+  const anatomicalTerms = [
+    'corticospinal tract', 'pons', 'medulla', 'cerebellum', 'cortex',
+    'abducens nerve', 'facial nerve', 'cranial nerve', 'CN VI', 'CN VII',
+    'medial longitudinal fasciculus', 'MLF', 'pyramids', 'decussation',
+    'contralateral', 'ipsilateral', 'upper motor neuron', 'lower motor neuron'
+  ];
+  
+  // Look for pathophysiological terms
+  const pathophysTerms = [
+    'ischemic stroke', 'TIA', 'thromboembolism', 'atrial fibrillation',
+    'hypertension', 'atherosclerosis', 'infarction', 'lesion',
+    'diplopia', 'dysarthria', 'dysphagia', 'paralysis', 'weakness'
+  ];
+  
+  // Look for drug classes and treatments
+  const treatmentTerms = [
+    'DOAC', 'warfarin', 'anticoagulation', 'antiplatelet', 'aspirin',
+    'clopidogrel', 'statin', 'ACE inhibitor', 'enalapril', 'atorvastatin'
+  ];
+  
+  // Look for clinical assessments
+  const clinicalTerms = [
+    'CHA₂DS₂-VASc', 'ABCD₃I', 'neurological examination', 'motor signs',
+    'sensory impairment', 'cranial nerve palsy', 'gaze preference'
+  ];
+  
+  const allTerms = [...anatomicalTerms, ...pathophysTerms, ...treatmentTerms, ...clinicalTerms];
+  
+  allTerms.forEach(term => {
+    if (answer.toLowerCase().includes(term.toLowerCase())) {
+      concepts.push(term);
+    }
+  });
+  
+  // Remove duplicates and limit to most relevant
+  return [...new Set(concepts)].slice(0, 8);
+};
+
+// Helper function to calculate a simple score based on key concepts
+const calculateScore = (userAnswer: string, correctAnswer: string): number => {
+  if (!userAnswer.trim()) return 0;
+  
+  const keyConcepts = extractKeyConcepts(correctAnswer);
+  const userAnswerLower = userAnswer.toLowerCase();
+  
+  let matchedConcepts = 0;
+  keyConcepts.forEach(concept => {
+    if (userAnswerLower.includes(concept.toLowerCase())) {
+      matchedConcepts++;
+    }
+  });
+  
+  // Return percentage of key concepts covered
+  return Math.round((matchedConcepts / keyConcepts.length) * 100);
+};
+
 const CaseStudyPage: React.FC = () => {
   const { caseId } = useParams<{ caseId: string }>();
   const caseStudy = caseStudy1; // In future, this could be dynamic based on caseId
@@ -10,7 +71,8 @@ const CaseStudyPage: React.FC = () => {
   const [state, setState] = useState<CaseStudyState>({
     currentQuestionIndex: 0,
     userAnswers: {},
-    showAnswer: false
+    showAnswer: false,
+    scores: {}
   });
 
   const currentQuestion = caseStudy.questions[state.currentQuestionIndex];
@@ -27,9 +89,14 @@ const CaseStudyPage: React.FC = () => {
   };
 
   const handleCheckAnswer = () => {
+    const score = calculateScore(userAnswer, currentQuestion.answer);
     setState(prev => ({
       ...prev,
-      showAnswer: true
+      showAnswer: true,
+      scores: {
+        ...prev.scores,
+        [currentQuestion.id]: score
+      }
     }));
   };
 
@@ -55,8 +122,18 @@ const CaseStudyPage: React.FC = () => {
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{caseStudy.title}</h1>
-          <div className="text-sm text-gray-600">
-            Question {state.currentQuestionIndex + 1} of {caseStudy.questions.length}
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-gray-600">
+              Question {state.currentQuestionIndex + 1} of {caseStudy.questions.length}
+            </div>
+            {Object.keys(state.scores).length > 0 && (
+              <div className="text-sm text-gray-600">
+                Average Score: {Math.round(
+                  Object.values(state.scores).reduce((sum, score) => sum + score, 0) / 
+                  Object.values(state.scores).length
+                )}%
+              </div>
+            )}
           </div>
         </div>
 
@@ -106,12 +183,67 @@ const CaseStudyPage: React.FC = () => {
 
           {/* Answer Display */}
           {state.showAnswer && (
-            <div className="mt-6 p-4 bg-green-50 border border-green-200 rounded-md">
-              <h3 className="text-lg font-semibold text-green-800 mb-3">Answer:</h3>
-              <div className="prose max-w-none">
-                <pre className="whitespace-pre-wrap text-green-700 leading-relaxed">
-                  {currentQuestion.answer}
-                </pre>
+            <div className="mt-6 space-y-4">
+              {/* Score Display */}
+              {state.scores[currentQuestion.id] !== undefined && (
+                <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-md">
+                  <div className="flex items-center justify-between">
+                    <h3 className="text-lg font-semibold text-yellow-800">Your Score:</h3>
+                    <div className="flex items-center space-x-2">
+                      <div className="text-2xl font-bold text-yellow-700">
+                        {state.scores[currentQuestion.id]}%
+                      </div>
+                      <div className="w-32 bg-yellow-200 rounded-full h-3">
+                        <div 
+                          className="bg-yellow-600 h-3 rounded-full transition-all duration-500"
+                          style={{ width: `${state.scores[currentQuestion.id]}%` }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                  <p className="text-sm text-yellow-700 mt-2">
+                    Based on key medical concepts covered in your answer
+                  </p>
+                </div>
+              )}
+
+              {/* Your Answer vs Correct Answer Comparison */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                {/* Your Answer */}
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
+                  <h3 className="text-lg font-semibold text-blue-800 mb-3">Your Answer:</h3>
+                  <div className="prose max-w-none">
+                    <pre className="whitespace-pre-wrap text-blue-700 leading-relaxed text-sm">
+                      {userAnswer || "No answer provided"}
+                    </pre>
+                  </div>
+                </div>
+
+                {/* Correct Answer */}
+                <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+                  <h3 className="text-lg font-semibold text-green-800 mb-3">Correct Answer:</h3>
+                  <div className="prose max-w-none">
+                    <pre className="whitespace-pre-wrap text-green-700 leading-relaxed text-sm">
+                      {currentQuestion.answer}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              {/* Key Concepts Analysis */}
+              <div className="p-4 bg-gray-50 border border-gray-200 rounded-md">
+                <h3 className="text-lg font-semibold text-gray-800 mb-3">Key Concepts to Review:</h3>
+                <div className="text-sm text-gray-600 mb-2">
+                  Compare your answer with the correct answer above. Look for these important concepts:
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
+                  {extractKeyConcepts(currentQuestion.answer).map((concept, index) => (
+                    <div key={index} className="flex items-start space-x-2">
+                      <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>
+                      <span className="text-gray-700">{concept}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
           )}

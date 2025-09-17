@@ -16,4 +16,5 @@ export interface CaseStudyState {
   currentQuestionIndex: number;
   userAnswers: Record<string, string>;
   showAnswer: boolean;
+  scores: Record<string, number>;
 }
