@@ -315,9 +315,9 @@ const CaseStudyPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-7xl mx-auto flex gap-6">
+      <div className={`mx-auto flex gap-6 transition-all duration-300 ${isHighlightsPanelOpen ? 'max-w-7xl' : 'max-w-4xl'}`}>
         {/* Main Content */}
-        <div className="flex-1 max-w-4xl">
+        <div className="flex-1">
           {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{caseStudy.title}</h1>
@@ -553,20 +553,19 @@ const CaseStudyPage: React.FC = () => {
         </div>
 
         {/* Highlights Panel Toggle Button */}
-        <div className="flex-shrink-0">
-          <button
-            onClick={() => setIsHighlightsPanelOpen(!isHighlightsPanelOpen)}
-            className="fixed top-4 right-4 z-50 bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
-            title={isHighlightsPanelOpen ? "Hide highlights panel" : "Show highlights panel"}
-          >
-            <svg className={`w-5 h-5 transition-transform duration-200 ${isHighlightsPanelOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
-          </button>
-        </div>
+        <button
+          onClick={() => setIsHighlightsPanelOpen(!isHighlightsPanelOpen)}
+          className="fixed top-4 right-4 z-50 bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+          title={isHighlightsPanelOpen ? "Hide highlights panel" : "Show highlights panel"}
+        >
+          <svg className={`w-5 h-5 transition-transform duration-200 ${isHighlightsPanelOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </button>
 
         {/* Highlights Panel */}
-        <div className={`w-80 flex-shrink-0 transition-all duration-300 ${isHighlightsPanelOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}>
+        {isHighlightsPanelOpen && (
+          <div className="w-80 flex-shrink-0">
           <div className="sticky top-4">
             <div className="bg-white rounded-lg shadow-md p-4">
               <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center justify-between">
@@ -629,7 +628,8 @@ const CaseStudyPage: React.FC = () => {
               )}
             </div>
           </div>
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
