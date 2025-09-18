@@ -240,41 +240,56 @@ const CaseStudyPage: React.FC = () => {
     caseTextRef.current.innerHTML = '';
     caseTextRef.current.textContent = originalText;
 
-    // Sort highlights by start position to apply them in order
+    // If no highlights, just return the original text
+    if (state.highlights.length === 0) {
+      return;
+    }
+
+    // Sort highlights by start position
     const sortedHighlights = [...state.highlights].sort((a, b) => a.start - b.start);
     
-    // Apply highlights from end to start to avoid offset issues
-    for (let i = sortedHighlights.length - 1; i >= 0; i--) {
-      const highlight = sortedHighlights[i];
-      const textNode = caseTextRef.current.childNodes[0];
-      
-      if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-        const text = textNode.textContent || '';
-        const beforeText = text.substring(0, highlight.start);
-        const highlightText = text.substring(highlight.start, highlight.end);
-        const afterText = text.substring(highlight.end);
+    // Build the highlighted content by processing the text once
+    const text = caseTextRef.current.textContent || '';
+    const parts: (string | { type: 'highlight'; text: string; color: string })[] = [];
+    let lastIndex = 0;
 
-        const fragment = document.createDocumentFragment();
-        
-        if (beforeText) {
-          fragment.appendChild(document.createTextNode(beforeText));
-        }
-        
+    sortedHighlights.forEach((highlight) => {
+      // Add text before this highlight
+      if (highlight.start > lastIndex) {
+        parts.push(text.substring(lastIndex, highlight.start));
+      }
+      
+      // Add the highlight
+      parts.push({
+        type: 'highlight',
+        text: highlight.text,
+        color: highlight.color
+      });
+      
+      lastIndex = highlight.end;
+    });
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      parts.push(text.substring(lastIndex));
+    }
+
+    // Clear and rebuild the content
+    caseTextRef.current.innerHTML = '';
+    
+    parts.forEach((part, index) => {
+      if (typeof part === 'string') {
+        caseTextRef.current?.appendChild(document.createTextNode(part));
+      } else {
         const mark = document.createElement('mark');
         mark.className = 'text-highlight';
-        mark.style.backgroundColor = highlight.color;
+        mark.style.backgroundColor = part.color;
         mark.style.padding = '2px 0';
         mark.style.borderRadius = '2px';
-        mark.textContent = highlightText;
-        fragment.appendChild(mark);
-        
-        if (afterText) {
-          fragment.appendChild(document.createTextNode(afterText));
-        }
-
-        textNode.parentNode?.replaceChild(fragment, textNode);
+        mark.textContent = part.text;
+        caseTextRef.current?.appendChild(mark);
       }
-    }
+    });
   }, [state.highlights, caseStudy.case]);
 
   // Apply highlights when they change
