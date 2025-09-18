@@ -59,12 +59,7 @@ Contralateral motor weakness of the body similar to a pontine lesion. However, t
 
 In a cortical lesion, cranial nerve nuclei are not directly affected. Therefore, you wouldn't see the ipsilateral facial nerve (CN VII) or abducens nerve (CN VI) palsies seen in Mr. Garrett's case. Eye movement abnormalities from cortical strokes tend to involve gaze preference (i.e., both eyes deviate towards the side of the lesion) rather than a discrete deficit in a single cranial nerve.
 
-Other symptoms such as aphasia may be present as well in a cortical lesion`,
-      clues: [
-        "Crossed CN/body signs = brainstem.",
-        "VI/VII → pons.",
-        "Right ventral caudal pons; cortex would give UMN face (forehead spared) ± aphasia/gaze preference."
-      ]
+Other symptoms such as aphasia may be present as well in a cortical lesion`
     },
     {
       id: "q4",
@@ -77,12 +72,7 @@ Spinothalamic pathway: Contralateral Pain and Temp
 Loss of pain and temperature sensation on the left side of the body (below the head). This occurs because the spinothalamic tract crosses over almost immediately after entering the spinal cord, so the fibres from the left side of the body ascend on the right side of the brainstem.
 
 VTTT: Contralateral sensory information from the trigeminal nerve (CN V)
-Loss of pain, temperature, and crude touch sensation on the left side of the face. This occurs because sensory fibres from the trigeminal nerve decussate (cross over) at the level of the pons and medulla to join the VTTT on the opposite side.`,
-      clues: [
-        "Small ventral pontine lesions may spare sensation.",
-        "Which tracts carry vibration/proprioception vs pain/temperature?",
-        "If involved: right ML → left vibration/proprioception loss; right STT → left pain/temp loss; right VTTT → left facial pain/temp loss."
-      ]
+Loss of pain, temperature, and crude touch sensation on the left side of the face. This occurs because sensory fibres from the trigeminal nerve decussate (cross over) at the level of the pons and medulla to join the VTTT on the opposite side.`
     },
     {
       id: "q5",
@@ -94,12 +84,7 @@ Dysphagia: Due to disruption of motor control pathways for cranial nerves IX (gl
 
 Alternate answer:
 Contralateral tongue deviation: lesion to corticobulbar tract, causing UMN lesion to hypoglossal nucleus.
-Contralateral weakness of trapezius (assessed with weakness on shoulder depression): caused by lesion to corticobulbar tract, which has fibres to spinal root of accessory nerve`,
-      clues: [
-        "Think corticobulbar involvement.",
-        "Which functions reflect IX/X/XII pathways?",
-        "Dysarthria and dysphagia are most likely (alt: UMN XII → tongue deviates away)."
-      ]
+Contralateral weakness of trapezius (assessed with weakness on shoulder depression): caused by lesion to corticobulbar tract, which has fibres to spinal root of accessory nerve`
     },
     {
       id: "q7",
@@ -115,12 +100,7 @@ His CHA₂DS₂-VASc score of 5 indicates a high risk for stroke, and anticoagul
 Other
 Continued/dual antiplatelet therapy (e.g., aspirin and clopidogrel) in the short term to reduce the risk of recurrent TIA or stroke.
 Optimisation of antihypertensive therapy to control blood pressure and reduce stroke risk.
-Continuation of statin therapy to manage hyperlipidaemia and reduce atherosclerotic burden.`,
-      clues: [
-        "Irregularly irregular rhythm + high CHA₂DS₂-VASc = embolic risk.",
-        "What reduces cardio-embolic stroke better than aspirin?",
-        "Start oral anticoagulation once bleed is excluded; also BP and high-intensity statin."
-      ]
+Continuation of statin therapy to manage hyperlipidaemia and reduce atherosclerotic burden.`
     },
     {
       id: "q8",
@@ -130,12 +110,7 @@ Continuation of statin therapy to manage hyperlipidaemia and reduce atherosclero
 Warfarin (VKA): Initial dose 5 mg orally daily, adjusted based on INR (if DOACs are contraindicated)
 Clopidogrel (P2Y12 inhibitor): 75 mg orally once daily
 Aspirin (already on low-dose, may need adjustment)
-Enalapril (ACEi), atorvastatin (Statin): Both orally`,
-      clues: [
-        "Oral agents that anticoagulate without INR checks?",
-        "Name the class used first-line in AF stroke prevention.",
-        "DOAC by mouth (examples acceptable); warfarin if DOAC unsuitable."
-      ]
+Enalapril (ACEi), atorvastatin (Statin): Both orally`
     },
     {
       id: "q9",
@@ -145,12 +120,7 @@ Enalapril (ACEi), atorvastatin (Statin): Both orally`,
 
 Anticoagulation for Atrial Fibrillation and Stroke Prevention
 Antiplatelet Therapy
-Hypertension Management`,
-      clues: [
-        "Long-term stroke prevention needs more than one pill.",
-        "What must you monitor with anticoagulants?",
-        "Adherence + renal/bleed checks, AF rate/rhythm plan, BP/statin, and risk factor modification."
-      ]
+Hypertension Management`
     },
     {
       id: "q11",
@@ -160,12 +130,7 @@ Hypertension Management`,
 
 NRT (e.g., nicotine patches, gum, lozenges) helps reduce withdrawal symptoms and cravings by providing a controlled dose of nicotine without the harmful chemicals found in cigarettes.
 
-Counselling (behavioural support) complements NRT by addressing the psychological aspects of smoking addiction, offering coping mechanisms, and encouraging long-term cessation.`,
-      clues: [
-        "Which single medicine has strong quit rates?",
-        "Pair meds with what to boost success?",
-        "Varenicline + behavioural support (or combo NRT if needed)."
-      ]
+Counselling (behavioural support) complements NRT by addressing the psychological aspects of smoking addiction, offering coping mechanisms, and encouraging long-term cessation.`
     },
     {
       id: "q12",
@@ -173,12 +138,7 @@ Counselling (behavioural support) complements NRT by addressing the psychologica
       text: "Briefly describe ONE (1) population level strategy that has been introduced in Aotearoa New Zealand to reduce the harm from cigarette smoking.",
       answer: `Smokefree legislation combined with constant tobacco taxation and price increases on cigarettes
 
-Increasing the cost of tobacco products through taxation has been effective in reducing smoking rates, particularly among low-income groups and youth. This strategy discourages smoking by making it less affordable, contributing to the government's goal of a Smokefree 2025, which aims to reduce smoking prevalence to less than 5%.`,
-      clues: [
-        "What policy makes smoking less affordable/appealing?",
-        "It's not a prescription.",
-        "Excise tax rises (± plain packaging)."
-      ]
+Increasing the cost of tobacco products through taxation has been effective in reducing smoking rates, particularly among low-income groups and youth. This strategy discourages smoking by making it less affordable, contributing to the government's goal of a Smokefree 2025, which aims to reduce smoking prevalence to less than 5%.`
     },
     {
       id: "q13",
@@ -191,12 +151,7 @@ Financial strain can affect access to essential medications and healthcare, lead
 Poor housing conditions or housing instability are linked to worse health outcomes due to stress, lack of stability, and exposure to environmental hazards (e.g., damp or cold environments), which can exacerbate chronic conditions.
 
 "How easy is it for you to access healthy food options, such as fruits, vegetables, and whole grains?"
-Access to healthy food is crucial for managing chronic conditions like hypertension and supporting overall health. Limited access to nutritious food can lead to poor dietary choices, increased consumption of processed foods high in salt, sugar, and unhealthy fats, which can exacerbate health issues.`,
-      clues: [
-        "Barriers to appointments/meds?",
-        "Housing warmth/stability?",
-        "Access to healthy food/time to prepare?"
-      ]
+Access to healthy food is crucial for managing chronic conditions like hypertension and supporting overall health. Limited access to nutritious food can lead to poor dietary choices, increased consumption of processed foods high in salt, sugar, and unhealthy fats, which can exacerbate health issues.`
     },
     {
       id: "q15",
@@ -206,12 +161,7 @@ Access to healthy food is crucial for managing chronic conditions like hypertens
 Significant health challenges
 Health might not improve back to their normal baseline
 Lack of control over their life
-Self harm is a way to take back control and escape the pain`,
-      clues: [
-        "Post-stroke changes challenge identity and control.",
-        "Which feelings commonly drive self-harm?",
-        "Hopelessness/loss of independence and desire to regain control."
-      ]
+Self harm is a way to take back control and escape the pain`
     },
     {
       id: "q16",
@@ -220,12 +170,7 @@ Self harm is a way to take back control and escape the pain`,
       answer: `Substance abuse
 Social isolation
 Personal history of mental health disorders
-Family history of mental health issues`,
-      clues: [
-        "Think history + mental health.",
-        "Add substances and supports.",
-        "Prior self-harm, depression, alcohol misuse, isolation/chronic illness."
-      ]
+Family history of mental health issues`
     },
     {
       id: "q17",
@@ -235,12 +180,7 @@ Family history of mental health issues`,
 Having a supportive network of family, friends, or community can provide emotional support, encouragement, and practical help. Mr. Garrett's wife, in particular, can play a crucial role in offering companionship, understanding, and assistance in managing his health, which may help reduce feelings of isolation and hopelessness.
 
 Access to health care
-Effective mental health support, including counselling or therapy, can help Mr. Garrett develop coping strategies, address his feelings of despair, and improve his overall mental well-being. Engaging with healthcare professionals who can monitor his mental health and provide interventions as needed can significantly reduce his risk of suicidal behaviour.`,
-      clues: [
-        "Who can buffer risk?",
-        "What access reduces danger fast?",
-        "Engaged whānau/partner and rapid mental-health care with safety plan."
-      ]
+Effective mental health support, including counselling or therapy, can help Mr. Garrett develop coping strategies, address his feelings of despair, and improve his overall mental well-being. Engaging with healthcare professionals who can monitor his mental health and provide interventions as needed can significantly reduce his risk of suicidal behaviour.`
     },
     {
       id: "q18",
@@ -249,12 +189,7 @@ Effective mental health support, including counselling or therapy, can help Mr. 
       answer: `Individual Factors
 Family factors
 Community
-Societal`,
-      clues: [
-        "From the person outwards.",
-        "Next ring includes close relationships.",
-        "Individual – Relationship/whānau – Community – Societal."
-      ]
+Societal`
     },
     {
       id: "q19",
@@ -274,12 +209,7 @@ Terminally ill or having a grievous and irremediable condition
 Capable of making an informed decision.
 
 Informed consent and capacity
-Mental capacity to make an informed decision regarding assisted dying`,
-      clues: [
-        "Name two core ethical principles you'd weigh.",
-        "Which NZ law governs eligibility?",
-        "Autonomy & beneficence/non-maleficence; End of Life Choice Act 2019 (capacity/eligibility checks; post-stroke disability alone usually not eligible)."
-      ]
+Mental capacity to make an informed decision regarding assisted dying`
     }
   ]
 };

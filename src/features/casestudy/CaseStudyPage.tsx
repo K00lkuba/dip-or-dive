@@ -72,11 +72,13 @@ const CaseStudyPage: React.FC = () => {
     currentQuestionIndex: 0,
     userAnswers: {},
     showAnswer: false,
-    scores: {}
+    scores: {},
+    clueLevels: {}
   });
 
   const currentQuestion = caseStudy.questions[state.currentQuestionIndex];
   const userAnswer = state.userAnswers[currentQuestion.id] || '';
+  const currentClueLevel = state.clueLevels[currentQuestion.id] || 0;
 
   const handleAnswerChange = (value: string) => {
     setState(prev => ({
@@ -100,6 +102,18 @@ const CaseStudyPage: React.FC = () => {
     }));
   };
 
+  const handleShowClue = () => {
+    if (currentClueLevel < currentQuestion.clues.length) {
+      setState(prev => ({
+        ...prev,
+        clueLevels: {
+          ...prev.clueLevels,
+          [currentQuestion.id]: currentClueLevel + 1
+        }
+      }));
+    }
+  };
+
   const handleNextQuestion = () => {
     setState(prev => ({
       ...prev,
@@ -112,6 +126,14 @@ const CaseStudyPage: React.FC = () => {
     setState(prev => ({
       ...prev,
       currentQuestionIndex: Math.max(prev.currentQuestionIndex - 1, 0),
+      showAnswer: false
+    }));
+  };
+
+  const handleQuestionJump = (index: number) => {
+    setState(prev => ({
+      ...prev,
+      currentQuestionIndex: index,
       showAnswer: false
     }));
   };
@@ -170,6 +192,39 @@ const CaseStudyPage: React.FC = () => {
               disabled={state.showAnswer}
             />
           </div>
+
+          {/* Clue System */}
+          {!state.showAnswer && (
+            <div className="mb-6">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-semibold text-gray-800">Clues:</h3>
+                <button
+                  onClick={handleShowClue}
+                  disabled={currentClueLevel >= currentQuestion.clues.length}
+                  className="bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-medium py-2 px-4 rounded-md transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2"
+                >
+                  {currentClueLevel === 0 ? 'Show Clue 1' : 
+                   currentClueLevel < currentQuestion.clues.length ? `Show Clue ${currentClueLevel + 1}` : 
+                   'All Clues Shown'}
+                </button>
+              </div>
+              
+              {currentClueLevel > 0 && (
+                <div className="space-y-3">
+                  {currentQuestion.clues.slice(0, currentClueLevel).map((clue, index) => (
+                    <div key={index} className="p-3 bg-purple-50 border border-purple-200 rounded-md">
+                      <div className="flex items-start space-x-3">
+                        <div className="flex-shrink-0 w-6 h-6 bg-purple-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
+                          {index + 1}
+                        </div>
+                        <p className="text-purple-800 text-sm leading-relaxed">{clue}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Check Answer Button */}
           {!state.showAnswer && (
@@ -266,11 +321,7 @@ const CaseStudyPage: React.FC = () => {
             {caseStudy.questions.map((_, index) => (
               <button
                 key={index}
-                onClick={() => setState(prev => ({
-                  ...prev,
-                  currentQuestionIndex: index,
-                  showAnswer: false
-                }))}
+                onClick={() => handleQuestionJump(index)}
                 className={`w-8 h-8 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
                   index === state.currentQuestionIndex
                     ? 'bg-blue-600 text-white'

@@ -10,6 +10,7 @@ export interface Question {
   number: number;
   text: string;
   answer: string;
+  clues: string[];
 }
 
 export interface CaseStudyState {
@@ -17,4 +18,5 @@ export interface CaseStudyState {
   userAnswers: Record<string, string>;
   showAnswer: boolean;
   scores: Record<string, number>;
+  clueLevels: Record<string, number>;
 }
