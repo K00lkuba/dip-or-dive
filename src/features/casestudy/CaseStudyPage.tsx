@@ -80,6 +80,7 @@ const CaseStudyPage: React.FC = () => {
   const caseTextRef = useRef<HTMLDivElement>(null);
   const [isSelecting, setIsSelecting] = useState(false);
   const [selectionStart, setSelectionStart] = useState<number | null>(null);
+  const [isHighlightsPanelOpen, setIsHighlightsPanelOpen] = useState(true);
 
   const currentQuestion = caseStudy.questions[state.currentQuestionIndex];
   const userAnswer = state.userAnswers[currentQuestion.id] || '';
@@ -551,15 +552,39 @@ const CaseStudyPage: React.FC = () => {
         </div>
         </div>
 
+        {/* Highlights Panel Toggle Button */}
+        <div className="flex-shrink-0">
+          <button
+            onClick={() => setIsHighlightsPanelOpen(!isHighlightsPanelOpen)}
+            className="fixed top-4 right-4 z-50 bg-yellow-500 hover:bg-yellow-600 text-white p-3 rounded-full shadow-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2"
+            title={isHighlightsPanelOpen ? "Hide highlights panel" : "Show highlights panel"}
+          >
+            <svg className={`w-5 h-5 transition-transform duration-200 ${isHighlightsPanelOpen ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+            </svg>
+          </button>
+        </div>
+
         {/* Highlights Panel */}
-        <div className="w-80 flex-shrink-0">
+        <div className={`w-80 flex-shrink-0 transition-all duration-300 ${isHighlightsPanelOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-full pointer-events-none'}`}>
           <div className="sticky top-4">
             <div className="bg-white rounded-lg shadow-md p-4">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
-                <svg className="w-5 h-5 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                </svg>
-                Highlights ({state.highlights.length})
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center justify-between">
+                <div className="flex items-center">
+                  <svg className="w-5 h-5 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                  </svg>
+                  Highlights ({state.highlights.length})
+                </div>
+                <button
+                  onClick={() => setIsHighlightsPanelOpen(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  title="Hide panel"
+                >
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
               </h3>
               
               {state.highlights.length === 0 ? (
