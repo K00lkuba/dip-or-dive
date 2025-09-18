@@ -19,4 +19,13 @@ export interface CaseStudyState {
   showAnswer: boolean;
   scores: Record<string, number>;
   clueLevels: Record<string, number>;
+  highlights: Highlight[];
+}
+
+export interface Highlight {
+  id: string;
+  start: number;
+  end: number;
+  text: string;
+  color: string;
 }

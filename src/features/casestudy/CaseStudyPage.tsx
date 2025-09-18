@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useCallback } from 'react';
 import { useParams } from 'react-router-dom';
 import { caseStudy1 } from './sampleData';
-import { CaseStudyState } from './types';
+import { CaseStudyState, Highlight } from './types';
 
 // Helper function to extract key concepts from answers
 const extractKeyConcepts = (answer: string): string[] => {
@@ -73,8 +73,13 @@ const CaseStudyPage: React.FC = () => {
     userAnswers: {},
     showAnswer: false,
     scores: {},
-    clueLevels: {}
+    clueLevels: {},
+    highlights: []
   });
+
+  const caseTextRef = useRef<HTMLDivElement>(null);
+  const [isSelecting, setIsSelecting] = useState(false);
+  const [selectionStart, setSelectionStart] = useState<number | null>(null);
 
   const currentQuestion = caseStudy.questions[state.currentQuestionIndex];
   const userAnswer = state.userAnswers[currentQuestion.id] || '';
@@ -138,6 +143,113 @@ const CaseStudyPage: React.FC = () => {
     }));
   };
 
+  // Text highlighting functions
+  const getTextOffset = (element: HTMLElement, offset: number): number => {
+    const textNode = element.childNodes[0];
+    if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+      return offset;
+    }
+    return 0;
+  };
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (e.target === caseTextRef.current) {
+      setIsSelecting(true);
+      const selection = window.getSelection();
+      if (selection) {
+        const range = selection.getRangeAt(0);
+        const startOffset = range.startOffset;
+        setSelectionStart(startOffset);
+      }
+    }
+  };
+
+  const handleMouseUp = (e: React.MouseEvent) => {
+    if (isSelecting && caseTextRef.current) {
+      const selection = window.getSelection();
+      if (selection && selection.toString().trim()) {
+        const range = selection.getRangeAt(0);
+        const selectedText = selection.toString();
+        const startOffset = range.startOffset;
+        const endOffset = range.endOffset;
+        
+        // Check if this selection overlaps with existing highlights
+        const overlappingHighlight = state.highlights.find(highlight => 
+          (startOffset >= highlight.start && startOffset < highlight.end) ||
+          (endOffset > highlight.start && endOffset <= highlight.end) ||
+          (startOffset <= highlight.start && endOffset >= highlight.end)
+        );
+
+        if (overlappingHighlight) {
+          // Remove the overlapping highlight
+          setState(prev => ({
+            ...prev,
+            highlights: prev.highlights.filter(h => h.id !== overlappingHighlight.id)
+          }));
+        } else {
+          // Add new highlight
+          const newHighlight: Highlight = {
+            id: `highlight-${Date.now()}-${Math.random()}`,
+            start: startOffset,
+            end: endOffset,
+            text: selectedText,
+            color: '#ffeb3b' // Yellow highlight
+          };
+          
+          setState(prev => ({
+            ...prev,
+            highlights: [...prev.highlights, newHighlight]
+          }));
+        }
+      }
+      setIsSelecting(false);
+      setSelectionStart(null);
+      selection?.removeAllRanges();
+    }
+  };
+
+  const renderHighlightedText = (text: string, highlights: Highlight[]) => {
+    if (highlights.length === 0) {
+      return text;
+    }
+
+    // Sort highlights by start position
+    const sortedHighlights = [...highlights].sort((a, b) => a.start - b.start);
+    
+    let result: React.ReactNode[] = [];
+    let lastIndex = 0;
+
+    sortedHighlights.forEach((highlight, index) => {
+      // Add text before highlight
+      if (highlight.start > lastIndex) {
+        result.push(text.slice(lastIndex, highlight.start));
+      }
+      
+      // Add highlighted text
+      result.push(
+        <mark
+          key={highlight.id}
+          style={{ 
+            backgroundColor: highlight.color,
+            padding: '2px 0',
+            borderRadius: '2px'
+          }}
+        >
+          {highlight.text}
+        </mark>
+      );
+      
+      lastIndex = highlight.end;
+    });
+
+    // Add remaining text
+    if (lastIndex < text.length) {
+      result.push(text.slice(lastIndex));
+    }
+
+    return result;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-4xl mx-auto">
@@ -163,10 +275,31 @@ const CaseStudyPage: React.FC = () => {
         <div className="bg-white rounded-lg shadow-md p-6 mb-6">
           <h2 className="text-xl font-semibold text-gray-800 mb-4">Case Information</h2>
           <div className="prose max-w-none">
-            <pre className="whitespace-pre-wrap text-gray-700 leading-relaxed">
-              {caseStudy.case}
-            </pre>
+            <div 
+              ref={caseTextRef}
+              className="whitespace-pre-wrap text-gray-700 leading-relaxed select-text cursor-text"
+              onMouseDown={handleMouseDown}
+              onMouseUp={handleMouseUp}
+              style={{ userSelect: 'text' }}
+            >
+              {renderHighlightedText(caseStudy.case, state.highlights)}
+            </div>
           </div>
+          {state.highlights.length > 0 && (
+            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+              <div className="flex items-center justify-between">
+                <span className="text-sm text-yellow-800">
+                  {state.highlights.length} highlight{state.highlights.length !== 1 ? 's' : ''} 
+                </span>
+                <button
+                  onClick={() => setState(prev => ({ ...prev, highlights: [] }))}
+                  className="text-xs text-yellow-600 hover:text-yellow-800 underline"
+                >
+                  Clear all highlights
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Question */}
