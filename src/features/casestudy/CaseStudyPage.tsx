@@ -1,4 +1,4 @@
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { caseStudy1 } from './sampleData';
 import { CaseStudyState, Highlight } from './types';
@@ -208,47 +208,55 @@ const CaseStudyPage: React.FC = () => {
     }
   };
 
-  const renderHighlightedText = (text: string, highlights: Highlight[]) => {
-    if (highlights.length === 0) {
-      return text;
-    }
+  const applyHighlights = useCallback(() => {
+    if (!caseTextRef.current) return;
 
-    // Sort highlights by start position
-    const sortedHighlights = [...highlights].sort((a, b) => a.start - b.start);
-    
-    let result: React.ReactNode[] = [];
-    let lastIndex = 0;
-
-    sortedHighlights.forEach((highlight, index) => {
-      // Add text before highlight
-      if (highlight.start > lastIndex) {
-        result.push(text.slice(lastIndex, highlight.start));
+    // Clear existing highlights
+    const existingHighlights = caseTextRef.current.querySelectorAll('.text-highlight');
+    existingHighlights.forEach(highlight => {
+      const parent = highlight.parentNode;
+      if (parent) {
+        parent.replaceChild(document.createTextNode(highlight.textContent || ''), highlight);
+        parent.normalize();
       }
-      
-      // Add highlighted text
-      result.push(
-        <mark
-          key={highlight.id}
-          style={{ 
-            backgroundColor: highlight.color,
-            padding: '2px 0',
-            borderRadius: '2px'
-          }}
-        >
-          {highlight.text}
-        </mark>
-      );
-      
-      lastIndex = highlight.end;
     });
 
-    // Add remaining text
-    if (lastIndex < text.length) {
-      result.push(text.slice(lastIndex));
-    }
+    // Apply new highlights
+    state.highlights.forEach(highlight => {
+      const textNode = caseTextRef.current?.childNodes[0];
+      if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+        const text = textNode.textContent || '';
+        const beforeText = text.substring(0, highlight.start);
+        const highlightText = text.substring(highlight.start, highlight.end);
+        const afterText = text.substring(highlight.end);
 
-    return result;
-  };
+        const fragment = document.createDocumentFragment();
+        
+        if (beforeText) {
+          fragment.appendChild(document.createTextNode(beforeText));
+        }
+        
+        const mark = document.createElement('mark');
+        mark.className = 'text-highlight';
+        mark.style.backgroundColor = highlight.color;
+        mark.style.padding = '2px 0';
+        mark.style.borderRadius = '2px';
+        mark.textContent = highlightText;
+        fragment.appendChild(mark);
+        
+        if (afterText) {
+          fragment.appendChild(document.createTextNode(afterText));
+        }
+
+        textNode.parentNode?.replaceChild(fragment, textNode);
+      }
+    });
+  }, [state.highlights]);
+
+  // Apply highlights when they change
+  useEffect(() => {
+    applyHighlights();
+  }, [applyHighlights]);
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
@@ -282,7 +290,7 @@ const CaseStudyPage: React.FC = () => {
               onMouseUp={handleMouseUp}
               style={{ userSelect: 'text' }}
             >
-              {renderHighlightedText(caseStudy.case, state.highlights)}
+              {caseStudy.case}
             </div>
           </div>
           {state.highlights.length > 0 && (
