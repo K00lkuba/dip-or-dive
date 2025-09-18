@@ -146,7 +146,7 @@ export default function RadialConceptMap({
     ];
     
     for (let i = 0; i < numStars; i++) {
-      let x, y, size, brightness;
+      let x, y, size, brightness, color;
       
       // 40% chance to be in a cluster
       if (Math.random() < 0.4) {
@@ -165,12 +165,25 @@ export default function RadialConceptMap({
         brightness = Math.random() * 0.6 + 0.1; // Dimmer outside clusters
       }
       
+      // Assign colors based on size and brightness
+      const colorChoice = Math.random();
+      if (colorChoice < 0.6) {
+        color = '#ffffff'; // White stars (most common)
+      } else if (colorChoice < 0.8) {
+        color = '#87ceeb'; // Sky blue
+      } else if (colorChoice < 0.9) {
+        color = '#ffd700'; // Gold/yellow
+      } else {
+        color = '#ff6b6b'; // Red/pink
+      }
+      
       starList.push({
         id: `star-${i}`,
         x,
         y,
         size,
         brightness,
+        color,
       });
     }
     
@@ -321,7 +334,8 @@ export default function RadialConceptMap({
                 cx={star.x}
                 cy={star.y}
                 r={star.size}
-                fill={`rgba(255, 255, 255, ${star.brightness})`}
+                fill={star.color}
+                opacity={star.brightness}
                 className="transition-opacity duration-1000"
               />
             </g>
