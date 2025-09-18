@@ -513,19 +513,27 @@ const CaseStudyPage: React.FC = () => {
           </button>
 
           <div className="flex space-x-2">
-            {caseStudy.questions.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => handleQuestionJump(index)}
-                className={`w-8 h-8 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
-                  index === state.currentQuestionIndex
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                {index + 1}
-              </button>
-            ))}
+            {caseStudy.questions.map((question, index) => {
+              const isAnswered = state.scores[question.id] !== undefined;
+              const isCurrent = index === state.currentQuestionIndex;
+              
+              return (
+                <button
+                  key={index}
+                  onClick={() => handleQuestionJump(index)}
+                  className={`w-8 h-8 rounded-full text-sm font-medium transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 ${
+                    isCurrent
+                      ? 'bg-blue-600 text-white'
+                      : isAnswered
+                      ? 'bg-green-500 text-white hover:bg-green-600'
+                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                  }`}
+                  title={isAnswered ? `Question ${index + 1} - Answered (${state.scores[question.id]}%)` : `Question ${index + 1} - Not answered`}
+                >
+                  {index + 1}
+                </button>
+              );
+            })}
           </div>
 
           <button
