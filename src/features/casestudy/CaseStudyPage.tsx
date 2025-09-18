@@ -144,23 +144,45 @@ const CaseStudyPage: React.FC = () => {
   };
 
   // Text highlighting functions
-  const getTextOffset = (element: HTMLElement, offset: number): number => {
-    const textNode = element.childNodes[0];
-    if (textNode && textNode.nodeType === Node.TEXT_NODE) {
-      return offset;
+
+  const getTextOffset = (element: HTMLElement, range: Range): { start: number; end: number } => {
+    const textContent = element.textContent || '';
+    const walker = document.createTreeWalker(
+      element,
+      NodeFilter.SHOW_TEXT,
+      null
+    );
+
+    let offset = 0;
+    let startOffset = 0;
+    let endOffset = 0;
+    let foundStart = false;
+    let foundEnd = false;
+
+    let node;
+    while (node = walker.nextNode()) {
+      const nodeLength = node.textContent?.length || 0;
+      
+      if (!foundStart && node === range.startContainer) {
+        startOffset = offset + range.startOffset;
+        foundStart = true;
+      }
+      
+      if (!foundEnd && node === range.endContainer) {
+        endOffset = offset + range.endOffset;
+        foundEnd = true;
+        break;
+      }
+      
+      offset += nodeLength;
     }
-    return 0;
+
+    return { start: startOffset, end: endOffset };
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (e.target === caseTextRef.current) {
+    if (e.target === caseTextRef.current || caseTextRef.current?.contains(e.target as Node)) {
       setIsSelecting(true);
-      const selection = window.getSelection();
-      if (selection) {
-        const range = selection.getRangeAt(0);
-        const startOffset = range.startOffset;
-        setSelectionStart(startOffset);
-      }
     }
   };
 
@@ -170,8 +192,9 @@ const CaseStudyPage: React.FC = () => {
       if (selection && selection.toString().trim()) {
         const range = selection.getRangeAt(0);
         const selectedText = selection.toString();
-        const startOffset = range.startOffset;
-        const endOffset = range.endOffset;
+        
+        // Get offsets relative to the original text content
+        const { start: startOffset, end: endOffset } = getTextOffset(caseTextRef.current, range);
         
         // Check if this selection overlaps with existing highlights
         const overlappingHighlight = state.highlights.find(highlight => 
@@ -203,7 +226,6 @@ const CaseStudyPage: React.FC = () => {
         }
       }
       setIsSelecting(false);
-      setSelectionStart(null);
       selection?.removeAllRanges();
     }
   };
@@ -211,19 +233,21 @@ const CaseStudyPage: React.FC = () => {
   const applyHighlights = useCallback(() => {
     if (!caseTextRef.current) return;
 
-    // Clear existing highlights
-    const existingHighlights = caseTextRef.current.querySelectorAll('.text-highlight');
-    existingHighlights.forEach(highlight => {
-      const parent = highlight.parentNode;
-      if (parent) {
-        parent.replaceChild(document.createTextNode(highlight.textContent || ''), highlight);
-        parent.normalize();
-      }
-    });
+    // Get the original text content
+    const originalText = caseStudy.case;
+    
+    // Clear the container and add the original text
+    caseTextRef.current.innerHTML = '';
+    caseTextRef.current.textContent = originalText;
 
-    // Apply new highlights
-    state.highlights.forEach(highlight => {
-      const textNode = caseTextRef.current?.childNodes[0];
+    // Sort highlights by start position to apply them in order
+    const sortedHighlights = [...state.highlights].sort((a, b) => a.start - b.start);
+    
+    // Apply highlights from end to start to avoid offset issues
+    for (let i = sortedHighlights.length - 1; i >= 0; i--) {
+      const highlight = sortedHighlights[i];
+      const textNode = caseTextRef.current.childNodes[0];
+      
       if (textNode && textNode.nodeType === Node.TEXT_NODE) {
         const text = textNode.textContent || '';
         const beforeText = text.substring(0, highlight.start);
@@ -250,8 +274,8 @@ const CaseStudyPage: React.FC = () => {
 
         textNode.parentNode?.replaceChild(fragment, textNode);
       }
-    });
-  }, [state.highlights]);
+    }
+  }, [state.highlights, caseStudy.case]);
 
   // Apply highlights when they change
   useEffect(() => {
