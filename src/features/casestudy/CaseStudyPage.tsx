@@ -314,8 +314,10 @@ const CaseStudyPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
+      <div className="max-w-7xl mx-auto flex gap-6">
+        {/* Main Content */}
+        <div className="flex-1 max-w-4xl">
+          {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{caseStudy.title}</h1>
           <div className="flex items-center justify-between">
@@ -546,6 +548,62 @@ const CaseStudyPage: React.FC = () => {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
             </svg>
           </button>
+        </div>
+        </div>
+
+        {/* Highlights Panel */}
+        <div className="w-80 flex-shrink-0">
+          <div className="sticky top-4">
+            <div className="bg-white rounded-lg shadow-md p-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
+                <svg className="w-5 h-5 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                </svg>
+                Highlights ({state.highlights.length})
+              </h3>
+              
+              {state.highlights.length === 0 ? (
+                <p className="text-gray-500 text-sm italic">
+                  No highlights yet. Select text in the case information to highlight it.
+                </p>
+              ) : (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {state.highlights.map((highlight, index) => (
+                    <div key={highlight.id} className="group">
+                      <div className="flex items-start space-x-2">
+                        <div className="w-2 h-2 bg-yellow-400 rounded-full mt-2 flex-shrink-0"></div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-gray-700 bg-yellow-50 p-2 rounded border-l-2 border-yellow-400">
+                            {highlight.text}
+                          </p>
+                          <button
+                            onClick={() => setState(prev => ({
+                              ...prev,
+                              highlights: prev.highlights.filter(h => h.id !== highlight.id)
+                            }))}
+                            className="text-xs text-gray-400 hover:text-red-500 mt-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              
+              {state.highlights.length > 0 && (
+                <div className="mt-4 pt-3 border-t border-gray-200">
+                  <button
+                    onClick={() => setState(prev => ({ ...prev, highlights: [] }))}
+                    className="w-full text-sm text-gray-600 hover:text-red-600 py-1 px-2 rounded hover:bg-red-50 transition-colors"
+                  >
+                    Clear all highlights
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
