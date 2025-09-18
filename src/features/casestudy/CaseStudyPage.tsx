@@ -315,9 +315,9 @@ const CaseStudyPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 p-4">
-      <div className={`mx-auto flex gap-6 transition-all duration-300 ${isHighlightsPanelOpen ? 'max-w-7xl' : 'max-w-4xl'}`}>
+      <div className={`mx-auto flex gap-6 transition-all duration-300 ${isHighlightsPanelOpen ? 'max-w-7xl' : 'max-w-7xl'}`}>
         {/* Main Content */}
-        <div className="flex-1">
+        <div className={`transition-all duration-300 ${isHighlightsPanelOpen ? 'flex-1' : 'w-full max-w-4xl mx-auto'}`}>
           {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">{caseStudy.title}</h1>
