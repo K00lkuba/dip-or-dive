@@ -188,45 +188,57 @@ const CaseStudyPage: React.FC = () => {
 
   const handleMouseUp = (e: React.MouseEvent) => {
     if (isSelecting && caseTextRef.current) {
-      const selection = window.getSelection();
-      if (selection && selection.toString().trim()) {
-        const range = selection.getRangeAt(0);
-        const selectedText = selection.toString();
-        
-        // Get offsets relative to the original text content
-        const { start: startOffset, end: endOffset } = getTextOffset(caseTextRef.current, range);
-        
-        // Check if this selection overlaps with existing highlights
-        const overlappingHighlight = state.highlights.find(highlight => 
-          (startOffset >= highlight.start && startOffset < highlight.end) ||
-          (endOffset > highlight.start && endOffset <= highlight.end) ||
-          (startOffset <= highlight.start && endOffset >= highlight.end)
-        );
-
-        if (overlappingHighlight) {
-          // Remove the overlapping highlight
-          setState(prev => ({
-            ...prev,
-            highlights: prev.highlights.filter(h => h.id !== overlappingHighlight.id)
-          }));
-        } else {
-          // Add new highlight
-          const newHighlight: Highlight = {
-            id: `highlight-${Date.now()}-${Math.random()}`,
-            start: startOffset,
-            end: endOffset,
-            text: selectedText,
-            color: '#ffeb3b' // Yellow highlight
-          };
+      // Add a small delay to ensure selection is complete
+      setTimeout(() => {
+        const selection = window.getSelection();
+        if (selection && selection.toString().trim()) {
+          const range = selection.getRangeAt(0);
+          const selectedText = selection.toString();
           
-          setState(prev => ({
-            ...prev,
-            highlights: [...prev.highlights, newHighlight]
-          }));
+          // Get offsets relative to the original text content
+          if (!caseTextRef.current) return;
+          const { start: startOffset, end: endOffset } = getTextOffset(caseTextRef.current, range);
+          
+          // Validate that the offsets are within the original text bounds
+          const originalText = caseStudy.case;
+          if (startOffset < 0 || endOffset > originalText.length || startOffset >= endOffset) {
+            setIsSelecting(false);
+            selection?.removeAllRanges();
+            return;
+          }
+          
+          // Check if this selection overlaps with existing highlights
+          const overlappingHighlight = state.highlights.find(highlight => 
+            (startOffset >= highlight.start && startOffset < highlight.end) ||
+            (endOffset > highlight.start && endOffset <= highlight.end) ||
+            (startOffset <= highlight.start && endOffset >= highlight.end)
+          );
+
+          if (overlappingHighlight) {
+            // Remove the overlapping highlight
+            setState(prev => ({
+              ...prev,
+              highlights: prev.highlights.filter(h => h.id !== overlappingHighlight.id)
+            }));
+          } else {
+            // Add new highlight
+            const newHighlight: Highlight = {
+              id: `highlight-${Date.now()}-${Math.random()}`,
+              start: startOffset,
+              end: endOffset,
+              text: selectedText,
+              color: '#ffeb3b' // Yellow highlight
+            };
+            
+            setState(prev => ({
+              ...prev,
+              highlights: [...prev.highlights, newHighlight]
+            }));
+          }
         }
-      }
-      setIsSelecting(false);
-      selection?.removeAllRanges();
+        setIsSelecting(false);
+        selection?.removeAllRanges();
+      }, 10);
     }
   };
 
@@ -236,27 +248,32 @@ const CaseStudyPage: React.FC = () => {
     // Get the original text content
     const originalText = caseStudy.case;
     
-    // Clear the container and add the original text
+    // Clear the container completely
     caseTextRef.current.innerHTML = '';
-    caseTextRef.current.textContent = originalText;
-
-    // If no highlights, just return the original text
+    
+    // If no highlights, just add the original text
     if (state.highlights.length === 0) {
+      caseTextRef.current.textContent = originalText;
       return;
     }
 
-    // Sort highlights by start position
-    const sortedHighlights = [...state.highlights].sort((a, b) => a.start - b.start);
+    // Filter out invalid highlights and sort by start position
+    const validHighlights = state.highlights
+      .filter(highlight => 
+        highlight.start >= 0 && 
+        highlight.end <= originalText.length && 
+        highlight.start < highlight.end
+      )
+      .sort((a, b) => a.start - b.start);
     
     // Build the highlighted content by processing the text once
-    const text = caseTextRef.current.textContent || '';
     const parts: (string | { type: 'highlight'; text: string; color: string })[] = [];
     let lastIndex = 0;
 
-    sortedHighlights.forEach((highlight) => {
+    validHighlights.forEach((highlight) => {
       // Add text before this highlight
       if (highlight.start > lastIndex) {
-        parts.push(text.substring(lastIndex, highlight.start));
+        parts.push(originalText.substring(lastIndex, highlight.start));
       }
       
       // Add the highlight
@@ -270,14 +287,12 @@ const CaseStudyPage: React.FC = () => {
     });
 
     // Add remaining text
-    if (lastIndex < text.length) {
-      parts.push(text.substring(lastIndex));
+    if (lastIndex < originalText.length) {
+      parts.push(originalText.substring(lastIndex));
     }
 
-    // Clear and rebuild the content
-    caseTextRef.current.innerHTML = '';
-    
-    parts.forEach((part, index) => {
+    // Build the content
+    parts.forEach((part) => {
       if (typeof part === 'string') {
         caseTextRef.current?.appendChild(document.createTextNode(part));
       } else {
